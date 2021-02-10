@@ -18,7 +18,6 @@ del get_versions, versions
 molread_ext_maps = {
     ".gro": "gro",
     ".pdb": "pdb",
-    ".top": "top",
     ".psf": "psf",
 }
 
