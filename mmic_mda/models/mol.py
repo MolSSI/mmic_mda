@@ -26,7 +26,7 @@ class MdaMol(ToolkitModel):
             if len(data.atoms):
                 return data
 
-        raise ValueError("MDAnalysis object does not contain any atoms!")
+        raise ValueError("MDAnalysis molecule object does not contain any atoms!")
 
     @classmethod
     @require("MDAnalysis")
