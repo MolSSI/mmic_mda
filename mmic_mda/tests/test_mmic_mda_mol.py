@@ -37,7 +37,7 @@ def test_mda_to_mol(guess_bonds):
 
 def test_mol_to_mda(guess_bonds):
     for file in top_file:
-       mm_mol = mm.models.molecule.mm_mol.Mol.from_file(file)
+       mm_mol = mm.models.molecule.mm_mol.Molecule.from_file(file)
        mmic_mda.components.MolToMdaComponent.compute(mm_mol)
 
 
@@ -47,4 +47,4 @@ def test_io_methods(guess_bonds):
        assert isinstance(mda_mol.data, mda_mol.dtype)
 
        mm_mol = mda_mol.to_schema()
-       assert isinstance(mm_mol, mm.models.molecule.Mol)
+       assert isinstance(mm_mol, mm.models.molecule.Molecule)
