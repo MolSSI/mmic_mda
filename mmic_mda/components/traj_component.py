@@ -1,19 +1,19 @@
 from mmelemental.components.trans.template_component import TransComponent
 from mmelemental.models.util.output import FileOutput
-from mmelemental.models.trajectory.mm_traj import Traj, Frame
+from mmelemental.models.trajectory import Trajectory, Frame
 from mmic_mda.models import MdaMol, MdaTraj
 from typing import Dict, Any, List, Tuple, Optional
 from mmelemental.util.decorators import require
 
-__all__ = ["MdaToTrajComponent"]
+__all__ = ["TrajToMdaComponent", "MdaToTrajComponent"]
 
 
-class MolToMdaComponent(TransComponent):
+class TrajToMdaComponent(TransComponent):
     """ A component for converting Molecule to MDAnalysis molecule object. """
 
     @classmethod
     def input(cls):
-        return Mol
+        return Trajectory
 
     @classmethod
     def output(cls):
@@ -22,7 +22,7 @@ class MolToMdaComponent(TransComponent):
     @require("MDAnalysis")
     def execute(
         self,
-        inputs: Traj,
+        inputs: Trajectory,
         extra_outfiles: Optional[List[str]] = None,
         extra_commands: Optional[List[str]] = None,
         scratch_name: Optional[str] = None,
@@ -86,7 +86,7 @@ class MdaToTrajComponent(TransComponent):
 
     @classmethod
     def output(cls):
-        return Traj
+        return Trajectory
 
     def execute(
         self,
@@ -95,10 +95,9 @@ class MdaToTrajComponent(TransComponent):
         extra_commands: Optional[List[str]] = None,
         scratch_name: Optional[str] = None,
         timeout: Optional[int] = None,
-    ) -> Tuple[bool, Traj]:
+    ) -> Tuple[bool, Trajectory]:
 
         mol = None
-        orient, validate, kwargs = False, None, None
         uni = inputs.data
 
         if hasattr(uni.atoms, "names"):
@@ -119,7 +118,4 @@ class MdaToTrajComponent(TransComponent):
             for frame in uni.trajectory
         ]
 
-        if kwargs:
-            input_dict.update(kwargs)
-
-        return True, Traj(top=mol, frames=frames)
+        return True, Trajectory(top=mol, frames=frames)
