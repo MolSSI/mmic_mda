@@ -9,7 +9,7 @@ This is part of the [MolSSI](http://molssi.org) Molecular Mechanics Interoperabl
 
 ![image](mmic_mda/data/imgs/component.png)
 
-# Basic API
+# API
 **mmic_mda** provides 3 classes of translators for: molecules, trajectories, and forcefields.
 
 ## Molecules
