@@ -34,4 +34,4 @@ units = {
     "angle": "degrees",
 }
 
-_classes_map = {"Mol": models.MdaMol, "Traj": models.MdaTraj}
+_classes_map = {"Molecule": models.MdaMol, "Trajectory": models.MdaTraj}
