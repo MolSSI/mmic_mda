@@ -1,8 +1,8 @@
 from pydantic import Field, validator
 from typing import Dict, Any, Optional
 from mmelemental.models.base import ToolkitModel
-from mmelemental.models.molecule import Mol
-from mmelemental.models.trajectory import Traj
+from mmelemental.models.molecule import Molecule
+from mmelemental.models.trajectory import Trajectory
 from mmelemental.util.decorators import require
 
 
@@ -36,7 +36,7 @@ class MdaTraj(ToolkitModel):
         cls, filename: str, top_filename: str = None, dtype: str = None, **kwargs
     ) -> "MdaTraj":
         """
-        Constructs an instance of MdaMol object from file(s).
+        Constructs an instance of MdaTraj object from file(s).
 
         Parameters
         ----------
@@ -50,8 +50,8 @@ class MdaTraj(ToolkitModel):
             Any additional keywords to pass to the constructor
         Returns
         -------
-        Mol
-            A constructed Mol class.
+        Trajectory
+            A constructed Trajectory class.
         """
         import MDAnalysis
 
@@ -68,31 +68,31 @@ class MdaTraj(ToolkitModel):
     @classmethod
     def from_schema(
         cls,
-        data: Traj,
+        data: Trajectory,
         version: Optional[str] = None,
         **kwargs: Dict[str, Any],
-    ) -> "Mol":
+    ) -> "MdaTraj":
         """
-        Constructs a Mol object from an MMSchema molecule object.
+        Constructs a MdaTraj object from an MMSchema Trajectory object.
         Parameters
         ----------
-        data: Mol
+        data: Trajectory
             Data to construct Molecule from.
         version: str, optional
             Schema version e.g. 1.0.1
         **kwargs
-            Additional kwargs to pass to the constructors. kwargs take precedence over data.
+            Additional kwargs to pass to the constructors.
         Returns
         -------
-        Mol
-            A constructed Mol class.
+        MdaTraj
+            A constructed MDAnalysis.Universe object.
         """
-        from mmic_mda.components.mol_component import MolToMdaComponent
+        from mmic_mda.components.traj_component import TrajToMdaComponent
 
-        return MolToMdaComponent.compute(data)
+        return TrajToMdaComponent.compute(data)
 
     def to_file(self, filename: str, **kwargs):
-        """Writes the molecule to a file.
+        """Writes the trajectory to a file.
         Parameters
         ----------
         filename : str
@@ -101,8 +101,8 @@ class MdaTraj(ToolkitModel):
         """
         self.data.atoms.write(filename, **kwargs)
 
-    def to_schema(self, version: Optional[str] = None, **kwargs) -> Mol:
-        """Converts the molecule to MMSchema molecule.
+    def to_schema(self, version: Optional[str] = None, **kwargs) -> Trajectory:
+        """Converts the MdaTraj to MMSchema Trajectory.
         Parameters
         ----------
         version: str, optional
@@ -110,6 +110,6 @@ class MdaTraj(ToolkitModel):
         **kwargs
             Additional kwargs to pass to the constructor.
         """
-        from mmic_mda.components.mol_component import MdaToMolComponent
+        from mmic_mda.components.traj_component import MdaToTrajComponent
 
-        return MdaToMolComponent.compute(self)
+        return MdaToTrajComponent.compute(self)

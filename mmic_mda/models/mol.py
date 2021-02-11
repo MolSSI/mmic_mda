@@ -1,7 +1,7 @@
 from pydantic import Field, validator
 from typing import Dict, Any, Optional
 from mmelemental.models.base import ToolkitModel
-from mmelemental.models.molecule.mm_mol import Mol
+from mmelemental.models.molecule import Molecule
 from mmelemental.util.decorators import require
 
 
@@ -9,7 +9,7 @@ __all__ = ["MdaMol"]
 
 
 class MdaMol(ToolkitModel):
-    """ A model for MDAnalysis.Universe storing an MM molecule. """
+    """ A model for MDAnalysis.Universe storing an MM Molecule. """
 
     @property
     @require("MDAnalysis")
@@ -72,15 +72,15 @@ class MdaMol(ToolkitModel):
     @classmethod
     def from_schema(
         cls,
-        data: Mol,
+        data: Molecule,
         version: Optional[str] = None,
         **kwargs: Dict[str, Any],
     ) -> "MdaMol":
         """
-        Constructs an MdaMol object from an MMSchema Mol object.
+        Constructs an MdaMol object from an MMSchema Molecule object.
         Parameters
         ----------
-        data: Mol
+        data: Molecule
             Data to construct Molecule from.
         version: str, optional
             Schema version e.g. 1.0.1
@@ -108,8 +108,8 @@ class MdaMol(ToolkitModel):
             kwargs["file_format"] = dtype
         self.data.atoms.write(filename, **kwargs)
 
-    def to_schema(self, version: Optional[str] = None, **kwargs) -> Mol:
-        """Converts the molecule to MMSchema molecule.
+    def to_schema(self, version: Optional[str] = None, **kwargs) -> Molecule:
+        """Converts the molecule to MMSchema Molecule.
         Parameters
         ----------
         version: str, optional
