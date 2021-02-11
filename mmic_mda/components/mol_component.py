@@ -1,6 +1,6 @@
 from mmelemental.components.trans.template_component import TransComponent
 from mmelemental.models.util.output import FileOutput
-from mmelemental.models.molecule.mm_mol import Mol
+from mmelemental.models.molecule import Molecule
 from mmic_mda.models import MdaMol
 from typing import Dict, Any, List, Tuple, Optional
 from mmelemental.util.decorators import require
@@ -14,7 +14,7 @@ class MolToMdaComponent(TransComponent):
 
     @classmethod
     def input(cls):
-        return Mol
+        return Molecule
 
     @classmethod
     def output(cls):
@@ -23,7 +23,7 @@ class MolToMdaComponent(TransComponent):
     @require("MDAnalysis")
     def execute(
         self,
-        inputs: Mol,
+        inputs: Molecule,
         extra_outfiles: Optional[List[str]] = None,
         extra_commands: Optional[List[str]] = None,
         scratch_name: Optional[str] = None,
@@ -109,7 +109,7 @@ class MdaToMolComponent(TransComponent):
 
     @classmethod
     def output(cls):
-        return Mol
+        return Molecule
 
     def execute(
         self,
@@ -118,7 +118,7 @@ class MdaToMolComponent(TransComponent):
         extra_commands: Optional[List[str]] = None,
         scratch_name: Optional[str] = None,
         timeout: Optional[int] = None,
-    ) -> Tuple[bool, Mol]:
+    ) -> Tuple[bool, Molecule]:
 
         import mmic_mda
 
@@ -157,7 +157,7 @@ class MdaToMolComponent(TransComponent):
             "names": names,
         }
 
-        return True, Mol(**input_dict)
+        return True, Molecule(**input_dict)
 
 
 def fast_set(seq: List) -> List:
