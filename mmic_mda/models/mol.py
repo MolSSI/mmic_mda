@@ -71,10 +71,7 @@ class MdaMol(ToolkitModel):
 
     @classmethod
     def from_schema(
-        cls,
-        data: Molecule,
-        version: Optional[str] = None,
-        **kwargs: Dict[str, Any],
+        cls, data: Molecule, version: Optional[str] = None, **kwargs: Dict[str, Any]
     ) -> "MdaMol":
         """
         Constructs an MdaMol object from an MMSchema Molecule object.

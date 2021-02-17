@@ -55,7 +55,7 @@ class MolToMdaComponent(TransComponent):
             residue_segindex=segindices,
             trajectory=True,
             velocities=True,
-            forces=True
+            forces=True,
         )
 
         mda_mol.add_TopologyAttr("type", inputs.symbols)

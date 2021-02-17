@@ -144,7 +144,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "mmic_mda.tex", "mmic_mda Documentation", "mmic_mda", "manual"),
+    (master_doc, "mmic_mda.tex", "mmic_mda Documentation", "mmic_mda", "manual")
 ]
 
 
@@ -169,7 +169,7 @@ texinfo_documents = [
         "mmic_mda",
         "A short description of the project.",
         "Miscellaneous",
-    ),
+    )
 ]
 
 

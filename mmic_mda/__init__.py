@@ -15,11 +15,7 @@ __git_revision__ = versions["full-revisionid"]
 del get_versions, versions
 
 # Need to update these lists
-molread_ext_maps = {
-    ".gro": "gro",
-    ".pdb": "pdb",
-    ".psf": "psf",
-}
+molread_ext_maps = {".gro": "gro", ".pdb": "pdb", ".psf": "psf"}
 
 molwrite_ext_maps = {".gro": "gro", ".pdb": "pdb"}
 
