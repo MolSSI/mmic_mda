@@ -2,7 +2,7 @@ from pydantic import Field, validator
 from typing import Dict, Any, Optional
 from mmelemental.models.base import ToolkitModel
 from mmelemental.models.molecule import Molecule
-from mmelemental.models.trajectory import Trajectory
+from mmelemental.models.collect import Trajectory
 from mmelemental.util.decorators import require
 
 
@@ -67,10 +67,7 @@ class MdaTraj(ToolkitModel):
 
     @classmethod
     def from_schema(
-        cls,
-        data: Trajectory,
-        version: Optional[str] = None,
-        **kwargs: Dict[str, Any],
+        cls, data: Trajectory, version: Optional[str] = None, **kwargs: Dict[str, Any]
     ) -> "MdaTraj":
         """
         Constructs a MdaTraj object from an MMSchema Trajectory object.
