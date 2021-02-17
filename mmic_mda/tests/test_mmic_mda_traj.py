@@ -47,4 +47,4 @@ def test_io_methods(guess_bonds):
     assert isinstance(mda_traj.data, mda_traj.dtype)
 
     mm_traj = mda_traj.to_schema()
-    assert isinstance(mm_traj, mm.models.trajectory.Trajectory)
+    assert isinstance(mm_traj, mm.models.collect.Trajectory)
