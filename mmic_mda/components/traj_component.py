@@ -1,6 +1,6 @@
 from mmelemental.components.trans.template_component import TransComponent
 from mmelemental.models.util.output import FileOutput
-from mmelemental.models.trajectory import Trajectory, Frame
+from mmelemental.models.collect import Trajectory, Frame
 from mmic_mda.models import MdaMol, MdaTraj
 from typing import Dict, Any, List, Tuple, Optional
 from mmelemental.util.decorators import require
@@ -118,4 +118,4 @@ class MdaToTrajComponent(TransComponent):
             for frame in uni.trajectory
         ]
 
-        return True, Trajectory(top=mol, frames=frames)
+        return True, Trajectory(mol=mol, frames=frames)
