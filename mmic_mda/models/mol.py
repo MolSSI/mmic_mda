@@ -1,4 +1,3 @@
-from pydantic import Field, validator
 from typing import Dict, Any, Optional
 from mmelemental.models.base import ToolkitModel
 from mmelemental.models.molecule import Molecule
@@ -19,8 +18,8 @@ class MdaMol(ToolkitModel):
 
         return Universe
 
-    @validator("data")
-    def valid_mol(cls, data):
+    @classmethod
+    def isvalid(cls, data):
         """ Makes sure the Universe object stores atoms. """
         if hasattr(data, "atoms"):
             if len(data.atoms):

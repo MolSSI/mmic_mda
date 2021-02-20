@@ -157,6 +157,7 @@ class MdaToMolComponent(TransComponent):
             "names": names,
         }
 
+        print(connectivity)
         return True, Molecule(**input_dict)
 
 

@@ -1,4 +1,3 @@
-from pydantic import Field, validator
 from typing import Dict, Any, Optional
 from mmelemental.models.base import ToolkitModel
 from mmelemental.models.molecule import Molecule
@@ -20,8 +19,8 @@ class MdaTraj(ToolkitModel):
 
         return Universe
 
-    @validator("data")
-    def valid_traj(cls, data):
+    @classmethod
+    def isvalid(cls, data):
         """ Makes sure the Universe object stores atoms and a trajectory. """
         if not hasattr(data, "atoms"):
             raise ValueError("MDAnalysis object does not contain any atoms!")
