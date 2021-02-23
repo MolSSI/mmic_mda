@@ -14,10 +14,15 @@ __version__ = versions["version"]
 __git_revision__ = versions["full-revisionid"]
 del get_versions, versions
 
-# Need to update these lists
-molread_ext_maps = {".gro": "gro", ".pdb": "pdb", ".psf": "psf"}
 
+# Molecule (xyz) read/write file extensions
+molread_ext_maps = {".gro": "gro", ".pdb": "pdb"}
 molwrite_ext_maps = {".gro": "gro", ".pdb": "pdb"}
+
+# Topology (connectivity and/or forcefield params) read/write extensions
+ffread_ext_maps = {".psf": "psf"}
+ffwrite_ext_maps = {".psf": "psf"}
+
 
 units = {
     "length": "angstrom",
