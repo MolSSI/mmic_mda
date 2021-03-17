@@ -1,9 +1,14 @@
-from mmelemental.components.trans.template_component import TransComponent
-from mmelemental.models.util.output import FileOutput
 from mmelemental.models.collect import Trajectory, Frame
-from mmic_mda.models import MdaMol, MdaTraj
-from typing import Dict, Any, List, Tuple, Optional
-from mmelemental.util.decorators import require
+from typing import List, Tuple, Optional
+import MDAnalysis
+
+from mmic_translator import TransComponent
+from mmic_translator.models.io import (
+    TransInput,
+    TransOutput,
+)
+
+from ..mmic_mda import units
 
 __all__ = ["TrajToMdaComponent", "MdaToTrajComponent"]
 
@@ -13,68 +18,29 @@ class TrajToMdaComponent(TransComponent):
 
     @classmethod
     def input(cls):
-        return Trajectory
+        return TransInput
 
     @classmethod
     def output(cls):
-        return MdaTraj
+        return TransOutput
 
-    @require("MDAnalysis")
     def execute(
         self,
-        inputs: Trajectory,
+        inputs: TransInput,
         extra_outfiles: Optional[List[str]] = None,
         extra_commands: Optional[List[str]] = None,
         scratch_name: Optional[str] = None,
         timeout: Optional[int] = None,
-    ) -> Tuple[bool, MdaTraj]:
+    ) -> Tuple[bool, TransOutput]:
 
-        import MDAnalysis
+        if isinstance(inputs, dict):
+            inputs = self.input()(**inputs)
 
-        natoms = len(inputs.masses)
+        mm_traj = inputs.schema_object
+        if hasattr(mm_traj, "mol"):
+            uni = mm_traj.mol.to_data("MDAnalysis")
 
-        if inputs.residues:
-            nres = len(inputs.residues)
-            resnames, resids = zip(*inputs.residues)
-
-        # Must account for segments as well
-        segindices = None
-
-        mda_mol = Universe.empty(
-            natoms,
-            n_residues=nres,
-            atom_resindex=resids,
-            residue_segindex=segindices,
-            trajectory=True,
-        )
-
-        mda_mol.add_TopologyAttr("type", inputs.symbols)
-        mda_mol.add_TopologyAttr("mass", inputs.masses)
-
-        if inputs.names is not None:
-            mda_mol.add_TopologyAttr("name", inputs.names)
-
-        if inputs.residues is not None:
-            mda_mol.add_TopologyAttr("resname", resnames)
-            mda_mol.add_TopologyAttr("resid", resids)
-
-        # mda_mol.add_TopologyAttr('segid', ['SOL'])
-
-        if inputs.geometry is not None:
-            mda_mol.atoms.positions = inputs.geometry.reshape(natoms, 3)
-
-        if inputs.velocities is not None:
-            mda_mol.atoms.velocities = inputs.velocities.reshape(natoms, 3)
-
-        if inputs.forces is not None:
-            mda_mol.atoms.positions = inputs.forces.reshape(natoms, 3)
-
-        if inputs.connectivity:
-            bonds = [(bond[0], bond[1]) for bond in inputs.connectivity]
-            mda_mol.add_TopologyAttr("bonds", bonds)
-            # How to load bond order?
-
-        return True, MdaMol(data=mda_mol)
+        return True, TransOutput(tk_object=uni, tk_units=units)
 
 
 class MdaToTrajComponent(TransComponent):
@@ -82,27 +48,38 @@ class MdaToTrajComponent(TransComponent):
 
     @classmethod
     def input(cls):
-        return MdaTraj
+        return TransInput
 
     @classmethod
     def output(cls):
-        return Trajectory
+        return TransOutput
 
     def execute(
         self,
-        inputs: MdaTraj,
+        inputs: TransInput,
         extra_outfiles: Optional[List[str]] = None,
         extra_commands: Optional[List[str]] = None,
         scratch_name: Optional[str] = None,
         timeout: Optional[int] = None,
-    ) -> Tuple[bool, Trajectory]:
+    ) -> Tuple[bool, TransOutput]:
+
+        if isinstance(inputs, dict):
+            inputs = self.input()(**inputs)
 
         mol = None
-        uni = inputs.data
+        uni = inputs.tk_object
 
         if hasattr(uni.atoms, "names"):
-            mda_mol = MdaMol(data=uni)
-            mol = mda_mol.to_schema()
+            from mmic_mda.components.mol_component import MdaToMolComponent
+
+            inputs = {
+                "tk_object": uni,
+                "schema_version": inputs.tk_version,
+                "kwargs": inputs.kwargs,
+            }
+            out = MdaToMolComponent.compute(inputs)
+            if TransComponent.get(out, "schema_version"):
+                assert inputs.schema_version == out.schema_version
 
         frames = [
             Frame(
@@ -117,5 +94,5 @@ class MdaToTrajComponent(TransComponent):
             )
             for frame in uni.trajectory
         ]
-
-        return True, Trajectory(mol=mol, frames=frames)
+        # By using frames we are assuming the topology is constant. Is this always true in MDAnalysis?
+        return True, TransOutput(schema_object=Trajectory(mol=mol, frames=frames))

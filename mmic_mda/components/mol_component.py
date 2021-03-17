@@ -1,10 +1,15 @@
-from mmelemental.components.trans.template_component import TransComponent
-from mmelemental.models.util.output import FileOutput
 from mmelemental.models.molecule import Molecule
-from mmic_mda.models import MdaMol
-from typing import Dict, Any, List, Tuple, Optional
-from mmelemental.util.decorators import require
+from typing import List, Tuple, Optional
 from mmelemental.util.units import convert
+import MDAnalysis
+
+from mmic_translator import TransComponent
+from mmic_translator.models.io import (
+    TransInput,
+    TransOutput,
+)
+
+from ..mmic_mda import units
 
 __all__ = ["MolToMdaComponent", "MdaToMolComponent"]
 
@@ -14,32 +19,32 @@ class MolToMdaComponent(TransComponent):
 
     @classmethod
     def input(cls):
-        return Molecule
+        return TransInput
 
     @classmethod
     def output(cls):
-        return MdaMol
+        return TransOutput
 
-    @require("MDAnalysis")
     def execute(
         self,
-        inputs: Molecule,
+        inputs: TransInput,
         extra_outfiles: Optional[List[str]] = None,
         extra_commands: Optional[List[str]] = None,
         scratch_name: Optional[str] = None,
         timeout: Optional[int] = None,
-    ) -> Tuple[bool, MdaMol]:
+    ) -> Tuple[bool, TransOutput]:
 
-        import MDAnalysis
-        import mmic_mda
+        if isinstance(inputs, dict):
+            inputs = self.input()(**inputs)
 
-        natoms = len(inputs.masses)
+        mmol = inputs.schema_object
+        natoms = len(mmol.symbols)
 
-        if inputs.residues:
-            residues = list(fast_set(inputs.residues))
+        if mmol.residues:
+            residues = list(fast_set(mmol.residues))
             nres = len(residues)
             resnames, _ = zip(*residues)
-            _, resids = zip(*inputs.residues)
+            _, resids = zip(*mmol.residues)
             resids = [i - 1 for i in resids]
         else:
             nres = 1
@@ -58,46 +63,46 @@ class MolToMdaComponent(TransComponent):
             forces=True,
         )
 
-        mda_mol.add_TopologyAttr("type", inputs.symbols)
-        mda_mol.add_TopologyAttr("mass", inputs.masses)
+        mda_mol.add_TopologyAttr("type", mmol.symbols)
+        mda_mol.add_TopologyAttr("mass", mmol.masses)
         mda_mol.atoms.masses = convert(
-            mda_mol.atoms.masses, inputs.masses_units, mmic_mda.units["mass"]
+            mda_mol.atoms.masses, mmol.masses_units, units["mass"]
         )
 
-        if inputs.names is not None:
-            mda_mol.add_TopologyAttr("name", inputs.names)
+        if mmol.atom_labels is not None:
+            mda_mol.add_TopologyAttr("name", mmol.atom_labels)
 
-        if inputs.residues is not None:
+        if mmol.residues is not None:
             mda_mol.add_TopologyAttr("resname", resnames)
 
         # mda_mol.add_TopologyAttr('segid', ['SOL'])
 
-        if inputs.geometry is not None:
-            mda_mol.atoms.positions = inputs.geometry.reshape(natoms, 3)
+        if mmol.geometry is not None:
+            mda_mol.atoms.positions = mmol.geometry.reshape(natoms, 3)
             mda_mol.atoms.positions = convert(
-                mda_mol.atoms.positions, inputs.geometry_units, mmic_mda.units["length"]
+                mda_mol.atoms.positions, mmol.geometry_units, units["length"]
             )
 
-        if inputs.velocities is not None:
-            mda_mol.atoms.velocities = inputs.velocities.reshape(natoms, 3)
+        if mmol.velocities is not None:
+            mda_mol.atoms.velocities = mmol.velocities.reshape(natoms, 3)
             mda_mol.atoms.velocities = convert(
                 mda_mol.atoms.velocities,
-                inputs.velocities_units,
-                mmic_mda.units["speed"],
+                mmol.velocities_units,
+                units["speed"],
             )
 
-        if inputs.forces is not None:
-            mda_mol.atoms.forces = inputs.forces.reshape(natoms, 3)
+        if mmol.forces is not None:
+            mda_mol.atoms.forces = mmol.forces.reshape(natoms, 3)
             mda_mol.atoms.forces = convert(
-                mda_mol.atoms.forces, inputs.forces_units, mmic_mda.units["force"]
+                mda_mol.atoms.forces, mmol.forces_units, units["force"]
             )
 
-        if inputs.connectivity:
-            bonds = [(bond[0], bond[1]) for bond in inputs.connectivity]
+        if mmol.connectivity:
+            bonds = [(bond[0], bond[1]) for bond in mmol.connectivity]
             mda_mol.add_TopologyAttr("bonds", bonds)
             # How to load bond order?
 
-        return True, MdaMol(data=mda_mol, units=mmic_mda.units)
+        return True, TransOutput(tk_object=mda_mol, tk_units=units)
 
 
 class MdaToMolComponent(TransComponent):
@@ -105,25 +110,26 @@ class MdaToMolComponent(TransComponent):
 
     @classmethod
     def input(cls):
-        return MdaMol
+        return TransInput
 
     @classmethod
     def output(cls):
-        return Molecule
+        return TransOutput
 
     def execute(
         self,
-        inputs: MdaMol,
+        inputs: "MdaMol",
         extra_outfiles: Optional[List[str]] = None,
         extra_commands: Optional[List[str]] = None,
         scratch_name: Optional[str] = None,
         timeout: Optional[int] = None,
-    ) -> Tuple[bool, Molecule]:
+    ) -> Tuple[bool, TransOutput]:
 
-        import mmic_mda
+        if isinstance(inputs, dict):
+            inputs = self.input()(**inputs)
 
         # get all properties + more from Universe?
-        uni = inputs.data
+        uni = inputs.tk_object
         geo = TransComponent.get(uni.atoms, "positions")
         vel = TransComponent.get(uni.atoms, "velocities")
         forces = TransComponent.get(uni.atoms, "forces")
@@ -147,20 +153,19 @@ class MdaToMolComponent(TransComponent):
         input_dict = {
             "symbols": symbs,
             "geometry": geo,
-            "geometry_units": mmic_mda.units["length"],
+            "geometry_units": units["length"],
             "velocities": vel,
-            "velocities_units": mmic_mda.units["speed"],
+            "velocities_units": units["speed"],
             "forces": forces,
-            "forces_units": mmic_mda.units["force"],
+            "forces_units": units["force"],
             "residues": residues,
             "connectivity": connectivity,
             "masses": masses,
-            "masses_units": mmic_mda.units["mass"],
-            "names": names,
+            "masses_units": units["mass"],
+            "atom_labels": names,
         }
 
-        print(connectivity)
-        return True, Molecule(**input_dict)
+        return True, TransOutput(schema_object=Molecule(**input_dict))
 
 
 def fast_set(seq: List) -> List:
