@@ -12,46 +12,45 @@ This is part of the [MolSSI](http://molssi.org) Molecular Mechanics Interoperabl
 # API
 **mmic_mda** provides 3 classes of translators for: molecules, trajectories, and forcefields.
 
-## Molecules
+## Models
 ```python
-from mmic_mda.models import MdaMol
-
-# Convert MMSchema to MDAnalysis molecule
-mda_mol = MdaMol.from_schema(mm_mol) -> MDAnalysis.Universe
-
-# Convert MDAnalysis to MMSchema molecule
-mm_mol = MdaMol.to_schema(mda_mol) -> mmelemental.models.molecule.Mol
-
-```
-# Under the hood
-## Molecules
-The `from_schema` and `to_schema` methods in the `MdaMol` model use translation components provided by **mmic_mda** and **MMElemental** to convert between MMSchema and MDAnalysis.
-
-```python
-from mmic_mda.components import MdaToMolComponent, MolToMdaComponent
-from mmic_mda.models.import MdaMol
-from mmelemental.models.molecule import Mol
+# Import models for MDAnalysis
+from mmic_mda.models import MdaMol, MdaFF, MdaTraj
+ 
+# Create mda objects from MMSchema models
+mda_mol = MdaMol.from_schema(mm_mol)
+mda_ff = MdaFF.from_schema(mm_ff)
+mda_traj = MdaTraj.from_schema(mm_traj)
+ 
+# Convert mda objects to MMSchema models
+mm_mol = mda_mol.to_schema()
+mm_ff = mda_ff.to_schema()
+mm_traj = mda_traj.to_schema()
 ```
 
-### MMSchema to MDAnalysis molecule
+## Components
 ```python
-# Creating MMSchema molecule
-mm_mol = Mol.from_file(path_to_file)
-
-# Running translator compute
-mda_mol = MolToMdaComponent.compute(mm_mol)
+# Import translation input model
+from mmic_translator.models import TransInput
+ 
+# Create input for converting Mda to MMSchema molecule
+from_mda = TransInput(
+        tk_object = MDAnalysis.Universe,
+        tk_units = mmic_mda.units
+)
+ 
+# Run conversion
+mm_mol = MdaToMolComponent.compute(from_mda)
+ 
+# Create input for converting MMSchema to Mda molecule
+from_mm = TransInput(
+        schema_object = MDAnalysis.Universe,
+        tk_version = '>=1.0.0'
+)
+ 
+# Run conversion
+mm_mol = MdaToMolComponent.compute(from_mda)
 ```
-
-### MDAnalysis to MMSchema molecule
-```python
-# Creating MDAnalysis input
-mda_uni = mda.Universe(path_to_file)
-mda_mol = mmic_mda.models.MdaMol(mol=mda_uni)
-
-# Running translator compute
-mm_mol = Translator.compute(mda_mol)
-```
-
 
 ### Copyright
 Copyright (c) 2021, MolSSI
