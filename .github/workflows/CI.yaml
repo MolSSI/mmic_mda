@@ -53,6 +53,8 @@ jobs:
         python -m pip install --upgrade pip
         git clone https://github.com/MolSSI/mmic
         cd mmic && pip install . && cd .. && rm -rf mmic
+        git clone https://github.com/MolSSI/mmic_translator
+        cd mmic_translator && pip install . && cd .. && rm -rf mmic_translator
         git clone https://github.com/MolSSI/MMElemental
         cd MMElemental && pip install . && cd .. && rm -rf MMElemental
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
