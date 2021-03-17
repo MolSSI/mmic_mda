@@ -1,9 +1,12 @@
 from typing import Dict, Any, Optional
-from mmelemental.models.base import ToolkitModel
+from mmic_translator.models import ToolkitModel
 from mmelemental.models.molecule import Molecule
 from mmelemental.models.collect import Trajectory
-from mmelemental.util.decorators import require
+import MDAnalysis
 
+# MDAnalysis converter components
+from mmic_mda.components.traj_component import TrajToMdaComponent
+from mmic_mda.components.traj_component import MdaToTrajComponent
 
 __all__ = ["MdaTraj"]
 
@@ -12,12 +15,9 @@ class MdaTraj(ToolkitModel):
     """ A model for MDAnalysis.Universe storing an MM trajectory. """
 
     @property
-    @require("MDAnalysis")
     def dtype(self):
         """ Returns the fundamental molecule object type. """
-        from MDAnalysis import Universe
-
-        return Universe
+        return MDAnalysis.Universe
 
     @classmethod
     def isvalid(cls, data):
@@ -30,7 +30,6 @@ class MdaTraj(ToolkitModel):
         raise ValueError("MDAnalysis object does not contain any trajectories!")
 
     @classmethod
-    @require("MDAnalysis")
     def from_file(
         cls, filename: str, top_filename: str = None, dtype: str = None, **kwargs
     ) -> "MdaTraj":
@@ -52,8 +51,6 @@ class MdaTraj(ToolkitModel):
         Trajectory
             A constructed Trajectory class.
         """
-        import MDAnalysis
-
         if dtype:
             kwargs["format"] = dtype
 
@@ -83,9 +80,8 @@ class MdaTraj(ToolkitModel):
         MdaTraj
             A constructed MDAnalysis.Universe object.
         """
-        from mmic_mda.components.traj_component import TrajToMdaComponent
-
-        return TrajToMdaComponent.compute(data)
+        inputs = {"schema_object": data, "schema_version": version}
+        return TrajToMdaComponent.compute(inputs)
 
     def to_file(self, filename: str, **kwargs):
         """Writes the trajectory to a file.
@@ -106,6 +102,8 @@ class MdaTraj(ToolkitModel):
         **kwargs
             Additional kwargs to pass to the constructor.
         """
-        from mmic_mda.components.traj_component import MdaToTrajComponent
-
-        return MdaToTrajComponent.compute(self)
+        inputs = {"tk_object": self.data, "schema_version": version, "kwargs": kwargs}
+        out = MdaToTrajComponent.compute(inputs)
+        if version:
+            assert version == out.schema_version
+        return out.schema_object

@@ -1,8 +1,11 @@
 from typing import Dict, Any, Optional
-from mmelemental.models.base import ToolkitModel
+from mmic_translator.models import ToolkitModel
 from mmelemental.models.molecule import Molecule
-from mmelemental.util.decorators import require
+import MDAnalysis
 
+# MDAnalysis converter components
+from mmic_mda.components.mol_component import MolToMdaComponent
+from mmic_mda.components.mol_component import MdaToMolComponent
 
 __all__ = ["MdaMol"]
 
@@ -11,12 +14,9 @@ class MdaMol(ToolkitModel):
     """ A model for MDAnalysis.Universe storing an MM Molecule. """
 
     @property
-    @require("MDAnalysis")
     def dtype(self):
         """ Returns the fundamental molecule object type. """
-        from MDAnalysis import Universe
-
-        return Universe
+        return MDAnalysis.Universe
 
     @classmethod
     def isvalid(cls, data):
@@ -28,7 +28,6 @@ class MdaMol(ToolkitModel):
         raise ValueError("MDAnalysis molecule object does not contain any atoms!")
 
     @classmethod
-    @require("MDAnalysis")
     def from_file(
         cls, filename: str = None, top_filename: str = None, dtype: str = None, **kwargs
     ) -> "MdaMol":
@@ -50,8 +49,6 @@ class MdaMol(ToolkitModel):
         MdaMol
             A constructed MdaMol class.
         """
-        import MDAnalysis
-
         if dtype:
             kwargs["format"] = dtype
 
@@ -87,9 +84,9 @@ class MdaMol(ToolkitModel):
         MdaMol
             A constructed MdaMol class.
         """
-        from mmic_mda.components.mol_component import MolToMdaComponent
-
-        return MolToMdaComponent.compute(data)
+        inputs = {"schema_object": data, "schema_version": version}
+        out = MolToMdaComponent.compute(inputs)
+        return cls(data=out.tk_object, units=out.tk_units)
 
     def to_file(self, filename: str, dtype: str = None, **kwargs):
         """Writes the molecule to a file.
@@ -113,6 +110,8 @@ class MdaMol(ToolkitModel):
         **kwargs
             Additional kwargs to pass to the constructor.
         """
-        from mmic_mda.components.mol_component import MdaToMolComponent
-
-        return MdaToMolComponent.compute(self)
+        inputs = {"tk_object": self.data, "schema_version": version, "kwargs": kwargs}
+        out = MdaToMolComponent.compute(inputs)
+        if version:
+            assert version == out.schema_version
+        return out.schema_object
