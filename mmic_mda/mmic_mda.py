@@ -5,30 +5,30 @@ A short description of the project.
 Handles the primary functions
 """
 
+__all__ = [
+    "molread_ext_maps",
+    "molwrite_ext_maps",
+    "ffread_ext_maps",
+    "ffwrite_ext_maps",
+    "units",
+]
 
-def canvas(with_attribution=True):
-    """
-    Placeholder function to show example docstring (NumPy format)
+# Molecule (xyz) read/write file extensions
+molread_ext_maps = {".gro": "gro", ".pdb": "pdb"}
+molwrite_ext_maps = {".gro": "gro", ".pdb": "pdb"}
 
-    Replace this function and doc string for your own project
-
-    Parameters
-    ----------
-    with_attribution : bool, Optional, default: True
-        Set whether or not to display who the quote is from
-
-    Returns
-    -------
-    quote : str
-        Compiled string including quote and optional attribution
-    """
-
-    quote = "The code is but a canvas to our imagination."
-    if with_attribution:
-        quote += "\n\t- Adapted from Henry David Thoreau"
-    return quote
+# Topology (connectivity and/or forcefield params) read/write extensions
+ffread_ext_maps = {".psf": "psf"}
+ffwrite_ext_maps = {".psf": "psf"}
 
 
-if __name__ == "__main__":
-    # Do something if this file is invoked on its own
-    print(canvas())
+units = {
+    "length": "angstrom",
+    "time": "ps",
+    "energy": "kJ/mol",
+    "charge": "e",
+    "speed": "angstrom/ps",
+    "force": "kJ/(mol*angstrom)",
+    "mass": "amu",
+    "angle": "degrees",
+}
