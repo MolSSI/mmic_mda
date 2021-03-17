@@ -28,17 +28,18 @@ def test_mmic_mda_imported():
     assert "mmic_mda" in sys.modules
 
 
-def test_mda_to_mol(guess_bonds):
+def test_mda_to_mol(guess_bonds, **kwargs):
     for file in top_file:
         uni = mda.Universe(file, guess_bonds=guess_bonds)
-        mda_mol = mmic_mda.models.MdaMol(data=uni)
-        mm_mol = mmic_mda.components.MdaToMolComponent.compute(mda_mol)
+        inputs = {"tk_object": uni, "kwargs": kwargs}
+        mm_mol = mmic_mda.components.MdaToMolComponent.compute(inputs)
 
 
 def test_mol_to_mda(guess_bonds):
     for file in top_file:
         mm_mol = mm.models.molecule.mm_mol.Molecule.from_file(file)
-        mmic_mda.components.MolToMdaComponent.compute(mm_mol)
+        inputs = {"schema_object": mm_mol}
+        mmic_mda.components.MolToMdaComponent.compute(inputs)
 
 
 def test_io_methods(guess_bonds):

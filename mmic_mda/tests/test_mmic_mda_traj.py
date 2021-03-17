@@ -26,18 +26,18 @@ def test_mmic_mda_imported():
     assert "mmic_mda" in sys.modules
 
 
-def test_mda_to_traj():
+def test_mda_to_traj(**kwargs):
     traj = mda.Universe(traj_file)
-    mda_traj = mmic_mda.models.MdaTraj(data=traj)
-    mm_traj = mmic_mda.components.MdaToTrajComponent.compute(mda_traj)
+    inputs = {"tk_object": traj, "kwargs": kwargs}
+    mm_traj = mmic_mda.components.MdaToTrajComponent.compute(inputs)
 
     return mm_traj
 
 
-def test_mda_to_top_traj(guess_bonds):
+def test_mda_to_top_traj(guess_bonds, **kwargs):
     traj = mda.Universe(top_file, traj_file, guess_bonds=guess_bonds)
-    mda_traj = mmic_mda.models.MdaTraj(data=traj)
-    mm_traj = mmic_mda.components.MdaToTrajComponent.compute(mda_traj)
+    inputs = {"tk_object": traj, "kwargs": kwargs}
+    mm_traj = mmic_mda.components.MdaToTrajComponent.compute(inputs)
 
     return mm_traj
 
