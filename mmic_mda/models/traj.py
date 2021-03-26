@@ -63,7 +63,7 @@ class MdaTraj(ToolkitModel):
 
     @classmethod
     def from_schema(
-        cls, data: Trajectory, version: Optional[str] = None, **kwargs: Dict[str, Any]
+        cls, data: Trajectory, version: Optional[int] = 0, **kwargs: Dict[str, Any]
     ) -> "MdaTraj":
         """
         Constructs a MdaTraj object from an MMSchema Trajectory object.
@@ -71,8 +71,8 @@ class MdaTraj(ToolkitModel):
         ----------
         data: Trajectory
             Data to construct Molecule from.
-        version: str, optional
-            Schema version e.g. 1.0.1
+        version: int, optional
+            Schema version e.g. 1. Overrides data.schema_version.
         **kwargs
             Additional kwargs to pass to the constructors.
         Returns
@@ -80,7 +80,7 @@ class MdaTraj(ToolkitModel):
         MdaTraj
             A constructed MDAnalysis.Universe object.
         """
-        inputs = {"schema_object": data, "schema_version": version}
+        inputs = {"schema_object": data, "schema_version": version or data.schema_version}
         return TrajToMdaComponent.compute(inputs)
 
     def to_file(self, filename: str, **kwargs):
@@ -93,16 +93,16 @@ class MdaTraj(ToolkitModel):
         """
         self.data.atoms.write(filename, **kwargs)
 
-    def to_schema(self, version: Optional[str] = None, **kwargs) -> Trajectory:
+    def to_schema(self, version: Optional[int] = 0, **kwargs) -> Trajectory:
         """Converts the MdaTraj to MMSchema Trajectory.
         Parameters
         ----------
-        version: str, optional
-            Schema version e.g. 1.0.1
+        version: int, optional
+            Schema version e.g. 1
         **kwargs
             Additional kwargs to pass to the constructor.
         """
-        inputs = {"tk_object": self.data, "schema_version": version, "kwargs": kwargs}
+        inputs = {"data_object": self.data, "schema_version": version, "kwargs": kwargs}
         out = MdaToTrajComponent.compute(inputs)
         if version:
             assert version == out.schema_version

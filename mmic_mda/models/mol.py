@@ -67,7 +67,7 @@ class MdaMol(ToolkitModel):
 
     @classmethod
     def from_schema(
-        cls, data: Molecule, version: Optional[str] = None, **kwargs: Dict[str, Any]
+        cls, data: Molecule, version: Optional[int] = 0, **kwargs: Dict[str, Any]
     ) -> "MdaMol":
         """
         Constructs an MdaMol object from an MMSchema Molecule object.
@@ -75,8 +75,8 @@ class MdaMol(ToolkitModel):
         ----------
         data: Molecule
             Data to construct Molecule from.
-        version: str, optional
-            Schema version e.g. 1.0.1
+        version: int, optional
+            Schema version e.g. 1. Overrides data.schema_version.
         **kwargs
             Additional kwargs to pass to the constructors. kwargs take precedence over data.
         Returns
@@ -84,9 +84,9 @@ class MdaMol(ToolkitModel):
         MdaMol
             A constructed MdaMol class.
         """
-        inputs = {"schema_object": data, "schema_version": version}
+        inputs = {"schema_object": data, "schema_version": version or data.schema_version}
         out = MolToMdaComponent.compute(inputs)
-        return cls(data=out.tk_object, units=out.tk_units)
+        return cls(data=out.data_object, units=out.data_units)
 
     def to_file(self, filename: str, dtype: str = None, **kwargs):
         """Writes the molecule to a file.
@@ -101,16 +101,16 @@ class MdaMol(ToolkitModel):
             kwargs["file_format"] = dtype
         self.data.atoms.write(filename, **kwargs)
 
-    def to_schema(self, version: Optional[str] = None, **kwargs) -> Molecule:
+    def to_schema(self, version: Optional[int] = 0, **kwargs) -> Molecule:
         """Converts the molecule to MMSchema Molecule.
         Parameters
         ----------
-        version: str, optional
-            Schema specification version to comply with e.g. 1.0.1.
+        version: int, optional
+            Schema specification version to comply with e.g. 1.
         **kwargs
             Additional kwargs to pass to the constructor.
         """
-        inputs = {"tk_object": self.data, "schema_version": version, "kwargs": kwargs}
+        inputs = {"data_object": self.data, "schema_version": version, "kwargs": kwargs}
         out = MdaToMolComponent.compute(inputs)
         if version:
             assert version == out.schema_version
