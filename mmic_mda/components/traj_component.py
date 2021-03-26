@@ -14,7 +14,7 @@ __all__ = ["TrajToMdaComponent", "MdaToTrajComponent"]
 
 
 class TrajToMdaComponent(TransComponent):
-    """ A component for converting Molecule to MDAnalysis molecule object. """
+    """ A component for converting Trajectory to MDAnalysis Universe object. """
 
     @classmethod
     def input(cls):
@@ -44,7 +44,7 @@ class TrajToMdaComponent(TransComponent):
 
 
 class MdaToTrajComponent(TransComponent):
-    """ A component for converting MDAnalysis molecule to Molecule object. """
+    """ A component for converting MDAnalysis Universe to Molecule object. """
 
     @classmethod
     def input(cls):
