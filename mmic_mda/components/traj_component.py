@@ -40,7 +40,7 @@ class TrajToMdaComponent(TransComponent):
         if hasattr(mm_traj, "mol"):
             uni = mm_traj.mol.to_data("MDAnalysis")
 
-        return True, TransOutput(tk_object=uni, tk_units=units)
+        return True, TransOutput(proc_input=inputs, data_object=uni, data_units=units)
 
 
 class MdaToTrajComponent(TransComponent):
@@ -66,15 +66,14 @@ class MdaToTrajComponent(TransComponent):
         if isinstance(inputs, dict):
             inputs = self.input()(**inputs)
 
-        mol = None
-        uni = inputs.tk_object
+        uni = inputs.data_object
 
         if hasattr(uni.atoms, "names"):
             from mmic_mda.components.mol_component import MdaToMolComponent
 
             inputs = {
-                "tk_object": uni,
-                "schema_version": inputs.tk_version,
+                "data_object": uni,
+                "schema_version": inputs.schema_version,
                 "kwargs": inputs.kwargs,
             }
             out = MdaToMolComponent.compute(inputs)
@@ -95,4 +94,4 @@ class MdaToTrajComponent(TransComponent):
             for frame in uni.trajectory
         ]
         # By using frames we are assuming the topology is constant. Is this always true in MDAnalysis?
-        return True, TransOutput(schema_object=Trajectory(mol=mol, frames=frames))
+        return True, TransOutput(proc_input=inputs, schema_object=Trajectory(top=None, frames=frames))

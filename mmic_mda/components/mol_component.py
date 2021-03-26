@@ -102,7 +102,7 @@ class MolToMdaComponent(TransComponent):
             mda_mol.add_TopologyAttr("bonds", bonds)
             # How to load bond order?
 
-        return True, TransOutput(tk_object=mda_mol, tk_units=units)
+        return True, TransOutput(proc_input=inputs, data_object=mda_mol, data_units=units)
 
 
 class MdaToMolComponent(TransComponent):
@@ -129,7 +129,7 @@ class MdaToMolComponent(TransComponent):
             inputs = self.input()(**inputs)
 
         # get all properties + more from Universe?
-        uni = inputs.tk_object
+        uni = inputs.data_object
         geo = TransComponent.get(uni.atoms, "positions")
         vel = TransComponent.get(uni.atoms, "velocities")
         forces = TransComponent.get(uni.atoms, "forces")
@@ -165,7 +165,7 @@ class MdaToMolComponent(TransComponent):
             "atom_labels": names,
         }
 
-        return True, TransOutput(schema_object=Molecule(**input_dict))
+        return True, TransOutput(proc_input=inputs, schema_object=Molecule(**input_dict))
 
 
 def fast_set(seq: List) -> List:
