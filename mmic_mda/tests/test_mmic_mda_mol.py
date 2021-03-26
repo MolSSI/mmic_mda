@@ -31,7 +31,7 @@ def test_mmic_mda_imported():
 def test_mda_to_mol(guess_bonds, **kwargs):
     for file in top_file:
         uni = mda.Universe(file, guess_bonds=guess_bonds)
-        inputs = {"tk_object": uni, "kwargs": kwargs}
+        inputs = {"data_object": uni, "kwargs": kwargs}
         mm_mol = mmic_mda.components.MdaToMolComponent.compute(inputs)
 
 

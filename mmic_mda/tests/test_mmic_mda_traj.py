@@ -28,7 +28,7 @@ def test_mmic_mda_imported():
 
 def test_mda_to_traj(**kwargs):
     traj = mda.Universe(traj_file)
-    inputs = {"tk_object": traj, "kwargs": kwargs}
+    inputs = {"data_object": traj, "kwargs": kwargs}
     mm_traj = mmic_mda.components.MdaToTrajComponent.compute(inputs)
 
     return mm_traj
@@ -36,7 +36,7 @@ def test_mda_to_traj(**kwargs):
 
 def test_mda_to_top_traj(guess_bonds, **kwargs):
     traj = mda.Universe(top_file, traj_file, guess_bonds=guess_bonds)
-    inputs = {"tk_object": traj, "kwargs": kwargs}
+    inputs = {"data_object": traj, "kwargs": kwargs}
     mm_traj = mmic_mda.components.MdaToTrajComponent.compute(inputs)
 
     return mm_traj
