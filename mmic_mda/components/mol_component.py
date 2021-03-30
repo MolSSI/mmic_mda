@@ -94,7 +94,9 @@ class MolToMdaComponent(TransComponent):
             mda_mol.add_TopologyAttr("bonds", bonds)
             # How to load bond order?
 
-        return True, TransOutput(proc_input=inputs, data_object=mda_mol, data_units=units)
+        return True, TransOutput(
+            proc_input=inputs, data_object=mda_mol, data_units=units
+        )
 
 
 class MdaToMolComponent(TransComponent):
@@ -157,7 +159,9 @@ class MdaToMolComponent(TransComponent):
             "atom_labels": names,
         }
 
-        return True, TransOutput(proc_input=inputs, schema_object=Molecule(**input_dict))
+        return True, TransOutput(
+            proc_input=inputs, schema_object=Molecule(**input_dict)
+        )
 
     def get_version(self) -> str:
         """Finds program, extracts version, returns normalized version string.
@@ -167,6 +171,7 @@ class MdaToMolComponent(TransComponent):
             Return a valid, safe python version string.
         """
         raise NotImplementedError
+
 
 def fast_set(seq: List) -> List:
     """ Removes duplicate entries in a list while preserving the order. """

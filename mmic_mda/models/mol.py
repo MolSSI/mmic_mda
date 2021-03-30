@@ -84,7 +84,10 @@ class MdaMol(ToolkitModel):
         MdaMol
             A constructed MdaMol class.
         """
-        inputs = {"schema_object": data, "schema_version": version or data.schema_version}
+        inputs = {
+            "schema_object": data,
+            "schema_version": version or data.schema_version,
+        }
         out = MolToMdaComponent.compute(inputs)
         return cls(data=out.data_object, units=out.data_units)
 
