@@ -31,7 +31,13 @@ class MdaTraj(ToolkitModel):
 
     @classmethod
     def from_file(
-        cls, filename: str, top_filename: str = None, dtype: str = None, **kwargs
+        cls,
+        filename: str,
+        top_filename: str = None,
+        dtype: str = None,
+        *,
+        all_frames=False,
+        **kwargs: Optional[Dict[str, Any]],
     ) -> "MdaTraj":
         """
         Constructs an instance of MdaTraj object from file(s).
@@ -44,8 +50,10 @@ class MdaTraj(ToolkitModel):
             The topology filename to read
         dtype: str, optional
             The type of file to interpret. If unset, MDAnalysis attempts to discover dtype from the file extension.
-        **kwargs
-            Any additional keywords to pass to the constructor
+        all_frames: bool, optional
+            Reads all frames in memory.
+        **kwargs: Dict[str, Any], optional
+            Any additional keywords to pass to the constructor.
         Returns
         -------
         Trajectory
@@ -55,15 +63,20 @@ class MdaTraj(ToolkitModel):
             kwargs["format"] = dtype
 
         if filename and top_filename:
-            mol = MDAnalysis.Universe(top_filename, filename, **kwargs)
+            mol = MDAnalysis.Universe(
+                top_filename, filename, in_memory=all_frames, **kwargs
+            )
         else:
-            mol = MDAnalysis.Universe(filename, **kwargs)
+            mol = MDAnalysis.Universe(filename, in_memory=all_frames, **kwargs)
 
         return cls(data=mol)
 
     @classmethod
     def from_schema(
-        cls, data: Trajectory, version: Optional[int] = 0, **kwargs: Dict[str, Any]
+        cls,
+        data: Trajectory,
+        version: Optional[int] = 0,
+        **kwargs: Optional[Dict[str, Any]],
     ) -> "MdaTraj":
         """
         Constructs a MdaTraj object from an MMSchema Trajectory object.
@@ -73,14 +86,17 @@ class MdaTraj(ToolkitModel):
             Data to construct Molecule from.
         version: int, optional
             Schema version e.g. 1. Overrides data.schema_version.
-        **kwargs
+        **kwargs: Dict[str, Any], optional
             Additional kwargs to pass to the constructors.
         Returns
         -------
         MdaTraj
             A constructed MDAnalysis.Universe object.
         """
-        inputs = {"schema_object": data, "schema_version": version or data.schema_version}
+        inputs = {
+            "schema_object": data,
+            "schema_version": version or data.schema_version,
+        }
         return TrajToMdaComponent.compute(inputs)
 
     def to_file(self, filename: str, **kwargs):
