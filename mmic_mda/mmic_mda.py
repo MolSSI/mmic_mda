@@ -8,6 +8,8 @@ Handles the primary functions
 __all__ = [
     "molread_ext_maps",
     "molwrite_ext_maps",
+    "trajread_ext_maps",
+    "trajwrite_ext_maps",
     "ffread_ext_maps",
     "ffwrite_ext_maps",
     "units",
@@ -21,6 +23,9 @@ molwrite_ext_maps = {".gro": "gro", ".pdb": "pdb"}
 ffread_ext_maps = {".psf": "psf"}
 ffwrite_ext_maps = {".psf": "psf"}
 
+# Trajectory read/write file extensions
+trajread_ext_maps = {".dcd": "dcd", ".trr": "trr"}
+trajwrite_ext_maps = {".dcd": "dcd", ".trr": "trr"}
 
 units = {
     "length": "angstrom",
