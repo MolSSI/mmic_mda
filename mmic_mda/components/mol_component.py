@@ -17,14 +17,6 @@ __all__ = ["MolToMdaComponent", "MdaToMolComponent"]
 class MolToMdaComponent(TransComponent):
     """ A component for converting Molecule to MDAnalysis molecule object. """
 
-    @classmethod
-    def input(cls):
-        return TransInput
-
-    @classmethod
-    def output(cls):
-        return TransOutput
-
     def execute(
         self,
         inputs: TransInput,
@@ -167,6 +159,14 @@ class MdaToMolComponent(TransComponent):
 
         return True, TransOutput(proc_input=inputs, schema_object=Molecule(**input_dict))
 
+    def get_version(self) -> str:
+        """Finds program, extracts version, returns normalized version string.
+        Returns
+        -------
+        str
+            Return a valid, safe python version string.
+        """
+        raise NotImplementedError
 
 def fast_set(seq: List) -> List:
     """ Removes duplicate entries in a list while preserving the order. """

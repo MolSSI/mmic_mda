@@ -46,14 +46,6 @@ class TrajToMdaComponent(TransComponent):
 class MdaToTrajComponent(TransComponent):
     """ A component for converting MDAnalysis Universe to Molecule object. """
 
-    @classmethod
-    def input(cls):
-        return TransInput
-
-    @classmethod
-    def output(cls):
-        return TransOutput
-
     def execute(
         self,
         inputs: TransInput,
@@ -95,3 +87,12 @@ class MdaToTrajComponent(TransComponent):
         ]
         # By using frames we are assuming the topology is constant. Is this always true in MDAnalysis?
         return True, TransOutput(proc_input=inputs, schema_object=Trajectory(top=None, frames=frames))
+
+    def get_version(self) -> str:
+        """Finds program, extracts version, returns normalized version string.
+        Returns
+        -------
+        str
+            Return a valid, safe python version string.
+        """
+        raise NotImplementedError
