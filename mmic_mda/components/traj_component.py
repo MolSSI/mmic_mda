@@ -86,7 +86,9 @@ class MdaToTrajComponent(TransComponent):
             for frame in uni.trajectory
         ]
         # By using frames we are assuming the topology is constant. Is this always true in MDAnalysis?
-        return True, TransOutput(proc_input=inputs, schema_object=Trajectory(top=None, frames=frames))
+        return True, TransOutput(
+            proc_input=inputs, schema_object=Trajectory(top=None, frames=frames)
+        )
 
     def get_version(self) -> str:
         """Finds program, extracts version, returns normalized version string.
