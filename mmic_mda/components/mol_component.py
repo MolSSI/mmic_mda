@@ -32,11 +32,11 @@ class MolToMdaComponent(TransComponent):
         mmol = inputs.schema_object
         natoms = len(mmol.symbols)
 
-        if mmol.residues:
-            residues = list(fast_set(mmol.residues))
+        if hasattr(mmol, "substructs"):
+            residues = list(fast_set(mmol.substructs))
             nres = len(residues)
             resnames, _ = zip(*residues)
-            _, resids = zip(*mmol.residues)
+            _, resids = zip(*mmol.substructs)
             resids = [i - 1 for i in resids]
         else:
             nres = 1
@@ -64,7 +64,7 @@ class MolToMdaComponent(TransComponent):
         if mmol.atom_labels is not None:
             mda_mol.add_TopologyAttr("name", mmol.atom_labels)
 
-        if mmol.residues is not None:
+        if hasattr(mmol, "substructs") is not None:
             mda_mol.add_TopologyAttr("resname", resnames)
 
         # mda_mol.add_TopologyAttr('segid', ['SOL'])
@@ -152,7 +152,7 @@ class MdaToMolComponent(TransComponent):
             "velocities_units": units["speed"],
             "forces": forces,
             "forces_units": units["force"],
-            "residues": residues,
+            "substructs": residues,
             "connectivity": connectivity,
             "masses": masses,
             "masses_units": units["mass"],
