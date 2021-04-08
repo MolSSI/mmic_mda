@@ -91,7 +91,7 @@ class MdaMol(ToolkitModel):
         out = MolToMdaComponent.compute(inputs)
         return cls(data=out.data_object, units=out.data_units)
 
-    def to_file(self, filename: str, dtype: str = None, **kwargs):
+    def to_file(self, filename: str, dtype: str = None, mode: str = "w", **kwargs):
         """Writes the molecule to a file.
         Parameters
         ----------
@@ -99,9 +99,14 @@ class MdaMol(ToolkitModel):
             The filename to write to
         dtype : Optional[str], optional
             File format
+        **kwargs: Optional[Dict[str, Any]], optional
+            Additional kwargs to pass to the constructor. kwargs takes precedence over data.
         """
         if dtype:
-            kwargs["file_format"] = dtype
+            kwargs["file_format"] = kwargs.get("file_format", dtype)
+        if mode != "w":
+            raise NotImplementedError("mmic_mda always overwrites existing files (mode=w).")
+
         self.data.atoms.write(filename, **kwargs)
 
     def to_schema(self, version: Optional[int] = 0, **kwargs) -> Molecule:
