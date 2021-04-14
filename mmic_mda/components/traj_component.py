@@ -1,6 +1,5 @@
 from mmelemental.models.collect import Trajectory, Frame
 from typing import List, Tuple, Optional
-import MDAnalysis
 
 from mmic_translator import TransComponent
 from mmic_translator.models.io import (

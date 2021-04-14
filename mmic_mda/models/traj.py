@@ -1,6 +1,5 @@
 from typing import Dict, Any, Optional
 from mmic_translator.models import ToolkitModel
-from mmelemental.models.molecule import Molecule
 from mmelemental.models.collect import Trajectory
 import MDAnalysis
 
@@ -16,7 +15,7 @@ class MdaTraj(ToolkitModel):
 
     @property
     def dtype(self):
-        """ Returns the fundamental molecule object type. """
+        """ Returns the fundamental trajectory object type. """
         return MDAnalysis.Universe
 
     @classmethod
@@ -83,7 +82,7 @@ class MdaTraj(ToolkitModel):
         Parameters
         ----------
         data: Trajectory
-            Data to construct Molecule from.
+            Data to construct Trajectory from.
         version: int, optional
             Schema version e.g. 1. Overrides data.schema_version.
         **kwargs: Dict[str, Any], optional
