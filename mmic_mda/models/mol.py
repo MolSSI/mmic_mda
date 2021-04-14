@@ -105,7 +105,9 @@ class MdaMol(ToolkitModel):
         if dtype:
             kwargs["file_format"] = kwargs.get("file_format", dtype)
         if mode != "w":
-            raise NotImplementedError("mmic_mda always overwrites existing files (mode=w).")
+            raise NotImplementedError(
+                "mmic_mda always overwrites existing files (mode=w)."
+            )
 
         self.data.atoms.write(filename, **kwargs)
 
