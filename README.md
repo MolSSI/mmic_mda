@@ -29,27 +29,34 @@ mm_traj = mda_traj.to_schema()
 ```
 
 ## Components
+Converting from `MDAnalysis.Universe` to `MMElemental.models.Molecule` is achieved with `MdaToMolComponent`:
+
 ```python
-# Import translation input model
-from mmic_translator.models import TransInput
  
 # Create input for converting Mda to MMSchema molecule
-from_mda = TransInput(
-        tk_object = MDAnalysis.Universe,
-        tk_units = mmic_mda.units
-)
+trans_in = {
+        "data_object": MDAnalysis.Universe,
+        "data_units": mmic_mda.units
+}
  
 # Run conversion
-mm_mol = MdaToMolComponent.compute(from_mda)
+trans_out = MdaToMolComponent.compute(trans_in)
+
+mm_mol = trans_out.schema_object -> MMElemental.models.Molecule
+```
+
+Converting from `MMElemental.models.Molecule` to `MDAnalysis.Universe` is achieved with `MolToMdaComponent`:
  
 # Create input for converting MMSchema to Mda molecule
-from_mm = TransInput(
-        schema_object = MDAnalysis.Universe,
-        tk_version = '>=1.0.0'
+trans_in = {
+        "schema_object": MDAnalysis.Universe,
+        "engine_version": '>=1.0.0' # reject conversion for MDAv < 1.0.0
 )
  
 # Run conversion
-mm_mol = MdaToMolComponent.compute(from_mda)
+trans_out = MolToMdaComponent.compute(trans_in)
+
+mda_uni = trans_out.data_object -> MDAnalysis.Universe
 ```
 
 ### Copyright
