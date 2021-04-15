@@ -9,18 +9,19 @@ import sys
 import os
 import MDAnalysis as mda
 import mmelemental as mm
+import mm_data
 
 
-data_dir = os.path.join("mmic_mda", "data")
-top_file = [
-    os.path.join(data_dir, "molecules", file)
-    for file in ("1dzl_fixed.pdb", "1dzl_fixed.gro")
-]
+top_file = (
+    mm_data.mols["alanine.gro"],
+    mm_data.mols["1dzl_fixed.pdb"],
+    mm_data.mols["1dzl_fixed.gro"],
+)
 
 
 def pytest_generate_tests(metafunc):
     if "guess_bonds" in metafunc.fixturenames:
-        metafunc.parametrize("guess_bonds", ["False", "True"])
+        metafunc.parametrize("guess_bonds", ["False", "False", "True"])
 
 
 def test_mmic_mda_imported():
