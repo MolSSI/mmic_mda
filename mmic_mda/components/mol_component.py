@@ -52,7 +52,7 @@ class MolToMdaComponent(TransComponent):
             residue_segindex=segindices,
             trajectory=True,
             velocities=True,
-            forces=True,
+            forces=False,
         )
 
         mda_mol.add_TopologyAttr("type", mmol.symbols)
@@ -81,12 +81,6 @@ class MolToMdaComponent(TransComponent):
                 mda_mol.atoms.velocities,
                 mmol.velocities_units,
                 units["speed"],
-            )
-
-        if mmol.forces is not None:
-            mda_mol.atoms.forces = mmol.forces.reshape(natoms, 3)
-            mda_mol.atoms.forces = convert(
-                mda_mol.atoms.forces, mmol.forces_units, units["force"]
             )
 
         if mmol.connectivity:
@@ -126,11 +120,12 @@ class MdaToMolComponent(TransComponent):
         uni = inputs.data_object
         geo = TransComponent.get(uni.atoms, "positions")
         vel = TransComponent.get(uni.atoms, "velocities")
-        forces = TransComponent.get(uni.atoms, "forces")
         symbs = TransComponent.get(uni.atoms, "types")
         names = TransComponent.get(uni.atoms, "names")
         if names is not None:
             names = names.tolist()  # must be list for MMSchema
+        if symbs is not None:
+            symbs = symbs.tolist()
         masses = TransComponent.get(uni.atoms, "masses")
 
         # If bond order is none, set it to 1.
@@ -150,8 +145,6 @@ class MdaToMolComponent(TransComponent):
             "geometry_units": units["length"],
             "velocities": vel,
             "velocities_units": units["speed"],
-            "forces": forces,
-            "forces_units": units["force"],
             "substructs": residues,
             "connectivity": connectivity,
             "masses": masses,
