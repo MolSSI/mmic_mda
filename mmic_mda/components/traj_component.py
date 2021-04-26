@@ -1,4 +1,4 @@
-from mmelemental.models.collect import Trajectory, Frame
+from mmelemental.models import Molecule, Trajectory
 from typing import List, Tuple, Optional
 
 from mmic_translator import TransComponent
@@ -13,7 +13,7 @@ __all__ = ["TrajToMdaComponent", "MdaToTrajComponent"]
 
 
 class TrajToMdaComponent(TransComponent):
-    """ A component for converting Trajectory to MDAnalysis Universe object. """
+    """A component for converting Trajectory to MDAnalysis Universe object."""
 
     @classmethod
     def input(cls):
@@ -43,7 +43,7 @@ class TrajToMdaComponent(TransComponent):
 
 
 class MdaToTrajComponent(TransComponent):
-    """ A component for converting MDAnalysis Universe to Molecule object. """
+    """A component for converting MDAnalysis Universe to Molecule object."""
 
     def execute(
         self,
@@ -71,22 +71,29 @@ class MdaToTrajComponent(TransComponent):
             if TransComponent.get(out, "schema_version"):
                 assert inputs.schema_version == out.schema_version
 
-        frames = [
-            Frame(
-                geometry=frame.positions if frame.has_positions else None,
-                geometry_units="A",
-                velocities=frame.velocities if frame.has_velocities else None,
-                velocities_units="A/ps",
-                forces=frame.forces if frame.has_forces else None,
-                forces_units="kJ/(mol*A)",
-                timestep=frame.dt,
-                timestep_units="ps",
-            )
-            for frame in uni.trajectory
-        ]
+        geometry, velocities, forces = [], [], []
+
+        for frame in uni.trajectory:
+            geometry.append(frame.positions) if frame.has_positions else ...
+            velocities.append(frame.velocities) if frame.has_velocities else ...
+            forces.append(frame.forces) if frame.has_forces else ...
+
+        timestep = uni.trajectory[0].dt
+        timestep_units = "ps"
+
         # By using frames we are assuming the topology is constant. Is this always true in MDAnalysis?
         return True, TransOutput(
-            proc_input=inputs, schema_object=Trajectory(top=None, frames=frames)
+            proc_input=inputs,
+            schema_object=Trajectory(
+                timestep=timestep,
+                timestep_units=timestep_units,
+                geometry=geometry,
+                geometry_units="A",
+                velocities=velocities,
+                velocities_units="A/ps",
+                forces=forces,
+                forces_units="kJ/(mol*A)",
+            ),
         )
 
     def get_version(self) -> str:
