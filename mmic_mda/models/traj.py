@@ -11,16 +11,16 @@ __all__ = ["MdaTraj"]
 
 
 class MdaTraj(ToolkitModel):
-    """ A model for MDAnalysis.Universe storing an MM trajectory. """
+    """A model for MDAnalysis.Universe storing an MM trajectory."""
 
     @property
     def dtype(self):
-        """ Returns the fundamental trajectory object type. """
+        """Returns the fundamental trajectory object type."""
         return MDAnalysis.Universe
 
     @classmethod
     def isvalid(cls, data):
-        """ Makes sure the Universe object stores atoms and a trajectory. """
+        """Makes sure the Universe object stores atoms and a trajectory."""
         if not hasattr(data, "atoms"):
             raise ValueError("MDAnalysis object does not contain any atoms!")
         elif hasattr(data, "trajectory"):

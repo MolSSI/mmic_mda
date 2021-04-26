@@ -15,7 +15,7 @@ __all__ = ["MolToMdaComponent", "MdaToMolComponent"]
 
 
 class MolToMdaComponent(TransComponent):
-    """ A component for converting Molecule to MDAnalysis molecule object. """
+    """A component for converting Molecule to MDAnalysis molecule object."""
 
     def execute(
         self,
@@ -94,7 +94,7 @@ class MolToMdaComponent(TransComponent):
 
 
 class MdaToMolComponent(TransComponent):
-    """ A component for converting MDAnalysis molecule to Molecule object. """
+    """A component for converting MDAnalysis molecule to Molecule object."""
 
     @classmethod
     def input(cls):
@@ -167,7 +167,7 @@ class MdaToMolComponent(TransComponent):
 
 
 def fast_set(seq: List) -> List:
-    """ Removes duplicate entries in a list while preserving the order. """
+    """Removes duplicate entries in a list while preserving the order."""
     seen = set()
     seen_add = seen.add
     return [x for x in seq if not (x in seen or seen_add(x))]

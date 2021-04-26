@@ -11,16 +11,16 @@ __all__ = ["MdaMol"]
 
 
 class MdaMol(ToolkitModel):
-    """ A model for MDAnalysis.Universe storing an MM Molecule. """
+    """A model for MDAnalysis.Universe storing an MM Molecule."""
 
     @property
     def dtype(self):
-        """ Returns the fundamental molecule object type. """
+        """Returns the fundamental molecule object type."""
         return MDAnalysis.Universe
 
     @classmethod
     def isvalid(cls, data):
-        """ Makes sure the Universe object stores atoms. """
+        """Makes sure the Universe object stores atoms."""
         if hasattr(data, "atoms"):
             if len(data.atoms):
                 return data
