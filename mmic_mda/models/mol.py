@@ -1,5 +1,8 @@
 from typing import Dict, Any, Optional
-from mmic_translator.models import ToolkitModel
+from mmic_translator.models import (
+    ToolkitModel,
+    schema_input_default,
+)
 from mmelemental.models.molecule import Molecule
 import MDAnalysis
 
@@ -13,8 +16,12 @@ __all__ = ["MdaMol"]
 class MdaMol(ToolkitModel):
     """A model for MDAnalysis.Universe storing an MM Molecule."""
 
-    @property
-    def dtype(self):
+    @classmethod
+    def engine(cls):
+        return "MDAnalysis", MDAnalysis.__version__
+
+    @classmethod
+    def dtype(cls):
         """Returns the fundamental molecule object type."""
         return MDAnalysis.Universe
 
@@ -87,6 +94,7 @@ class MdaMol(ToolkitModel):
         inputs = {
             "schema_object": data,
             "schema_version": version or data.schema_version,
+            "schema_name": schema_input_default,
         }
         out = MolToMdaComponent.compute(inputs)
         return cls(data=out.data_object, units=out.data_units)
@@ -120,7 +128,12 @@ class MdaMol(ToolkitModel):
         **kwargs
             Additional kwargs to pass to the constructor.
         """
-        inputs = {"data_object": self.data, "schema_version": version, "kwargs": kwargs}
+        inputs = {
+            "data_object": self.data,
+            "schema_version": version,
+            "schema_name": schema_input_default,
+            "keywords": kwargs,
+        }
         out = MdaToMolComponent.compute(inputs)
         if version:
             assert version == out.schema_version

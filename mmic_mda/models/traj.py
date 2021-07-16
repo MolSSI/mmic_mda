@@ -1,5 +1,5 @@
 from typing import Dict, Any, Optional
-from mmic_translator.models import ToolkitModel
+from mmic_translator.models import ToolkitModel, schema_input_default
 from mmelemental.models.collect import Trajectory
 import MDAnalysis
 
@@ -13,8 +13,12 @@ __all__ = ["MdaTraj"]
 class MdaTraj(ToolkitModel):
     """A model for MDAnalysis.Universe storing an MM trajectory."""
 
-    @property
-    def dtype(self):
+    @classmethod
+    def engine(cls):
+        return "MDAnalysis", MDAnalysis.__version__
+
+    @classmethod
+    def dtype(cls):
         """Returns the fundamental trajectory object type."""
         return MDAnalysis.Universe
 
@@ -95,6 +99,7 @@ class MdaTraj(ToolkitModel):
         inputs = {
             "schema_object": data,
             "schema_version": version or data.schema_version,
+            "schema_name": schema_input_default,
         }
         return TrajToMdaComponent.compute(inputs)
 
@@ -117,7 +122,12 @@ class MdaTraj(ToolkitModel):
         **kwargs
             Additional kwargs to pass to the constructor.
         """
-        inputs = {"data_object": self.data, "schema_version": version, "kwargs": kwargs}
+        inputs = {
+            "data_object": self.data,
+            "schema_version": version,
+            "schema_name": schema_input_default,
+            "keywords": kwargs,
+        }
         out = MdaToTrajComponent.compute(inputs)
         if version:
             assert version == out.schema_version
