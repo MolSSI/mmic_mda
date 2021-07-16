@@ -4,10 +4,7 @@ from mmelemental.util.units import convert
 import MDAnalysis
 
 from mmic_translator import TransComponent
-from mmic_translator.models.io import (
-    TransInput,
-    TransOutput,
-)
+from mmic_translator.models import TransInput, TransOutput, schema_output_default
 
 from ..mmic_mda import units
 
@@ -33,7 +30,7 @@ class MolToMdaComponent(TransComponent):
         natoms = len(mmol.symbols)
 
         if hasattr(mmol, "substructs"):
-            residues = list(fast_set(mmol.substructs))
+            residues = list(_fast_set(mmol.substructs))
             nres = len(residues)
             resnames, _ = zip(*residues)
             _, resids = zip(*mmol.substructs)
@@ -88,8 +85,14 @@ class MolToMdaComponent(TransComponent):
             mda_mol.add_TopologyAttr("bonds", bonds)
             # How to load bond order?
 
-        return True, TransOutput(
-            proc_input=inputs, data_object=mda_mol, data_units=units
+        success = True
+        return success, TransOutput(
+            proc_input=inputs,
+            data_object=mda_mol,
+            data_units=units,
+            schema_version=inputs.schema_version,
+            schema_name=schema_output_default,
+            success=success,
         )
 
 
@@ -152,8 +155,13 @@ class MdaToMolComponent(TransComponent):
             "atom_labels": names,
         }
 
-        return True, TransOutput(
-            proc_input=inputs, schema_object=Molecule(**input_dict)
+        success = True
+        return success, TransOutput(
+            proc_input=inputs,
+            schema_object=Molecule(**input_dict),
+            schema_version=inputs.schema_version,
+            schema_name=schema_output_default,
+            success=success,
         )
 
     def get_version(self) -> str:
@@ -166,7 +174,7 @@ class MdaToMolComponent(TransComponent):
         raise NotImplementedError
 
 
-def fast_set(seq: List) -> List:
+def _fast_set(seq: List) -> List:
     """Removes duplicate entries in a list while preserving the order."""
     seen = set()
     seen_add = seen.add
