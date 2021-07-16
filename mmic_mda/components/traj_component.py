@@ -2,9 +2,11 @@ from mmelemental.models import Molecule, Trajectory
 from typing import List, Tuple, Optional
 
 from mmic_translator import TransComponent
-from mmic_translator.models.io import (
+from mmic_translator.models import (
     TransInput,
     TransOutput,
+    schema_input_default,
+    schema_output_default,
 )
 
 from ..mmic_mda import units
@@ -39,7 +41,15 @@ class TrajToMdaComponent(TransComponent):
         if hasattr(mm_traj, "mol"):
             uni = mm_traj.mol.to_data("MDAnalysis")
 
-        return True, TransOutput(proc_input=inputs, data_object=uni, data_units=units)
+        success = True
+        return success, TransOutput(
+            proc_input=inputs,
+            data_object=uni,
+            data_units=units,
+            schema_version=inputs.schema_version,
+            schema_name=schema_output_default,
+            success=success,
+        )
 
 
 class MdaToTrajComponent(TransComponent):
@@ -62,12 +72,13 @@ class MdaToTrajComponent(TransComponent):
         if hasattr(uni.atoms, "names"):
             from mmic_mda.components.mol_component import MdaToMolComponent
 
-            inputs = {
+            inputs_mol = {
                 "data_object": uni,
                 "schema_version": inputs.schema_version,
-                "kwargs": inputs.kwargs,
+                "schema_name": schema_input_default,
+                "keywords": inputs.keywords,
             }
-            out = MdaToMolComponent.compute(inputs)
+            out = MdaToMolComponent.compute(inputs_mol)
             if TransComponent.get(out, "schema_version"):
                 assert inputs.schema_version == out.schema_version
 
@@ -82,7 +93,8 @@ class MdaToTrajComponent(TransComponent):
         timestep_units = "ps"
 
         # By using frames we are assuming the topology is constant. Is this always true in MDAnalysis?
-        return True, TransOutput(
+        success = True
+        return success, TransOutput(
             proc_input=inputs,
             schema_object=Trajectory(
                 timestep=timestep,
@@ -94,6 +106,9 @@ class MdaToTrajComponent(TransComponent):
                 forces=forces,
                 forces_units="kJ/(mol*A)",
             ),
+            schema_version=inputs.schema_version,
+            schema_name=schema_output_default,
+            success=success,
         )
 
     def get_version(self) -> str:
