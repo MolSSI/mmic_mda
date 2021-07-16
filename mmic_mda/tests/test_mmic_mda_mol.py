@@ -14,8 +14,8 @@ import mm_data
 
 top_file = (
     mm_data.mols["alanine.gro"],
-    mm_data.mols["1dzl_fixed.pdb"],
-    mm_data.mols["1dzl_fixed.gro"],
+    mm_data.mols["dialanine.pdb"],
+    mm_data.mols["dialanine.gro"],
 )
 
 
@@ -32,21 +32,31 @@ def test_mmic_mda_imported():
 def test_mda_to_mol(guess_bonds, **kwargs):
     for file in top_file:
         uni = mda.Universe(file, guess_bonds=guess_bonds)
-        inputs = {"data_object": uni, "kwargs": kwargs}
+        inputs = {
+            "data_object": uni,
+            "keywords": kwargs,
+            "schema_version": 1,
+            "schema_name": "mmel_input",
+        }
         mm_mol = mmic_mda.components.MdaToMolComponent.compute(inputs)
 
 
+@pytest.mark.skip("Memory leak detected.")
 def test_mol_to_mda(guess_bonds):
     for file in top_file:
         mm_mol = mm.models.molecule.mm_mol.Molecule.from_file(file)
-        inputs = {"schema_object": mm_mol}
+        inputs = {
+            "schema_object": mm_mol,
+            "schema_version": 1,
+            "schema_name": "mmel_input",
+        }
         mmic_mda.components.MolToMdaComponent.compute(inputs)
 
 
 def test_io_methods(guess_bonds):
     for file in top_file:
         mda_mol = mmic_mda.models.MdaMol.from_file(file, guess_bonds=guess_bonds)
-        assert isinstance(mda_mol.data, mda_mol.dtype)
+        assert isinstance(mda_mol.data, mda_mol.dtype())
 
         mm_mol = mda_mol.to_schema()
         assert isinstance(mm_mol, mm.models.molecule.Molecule)
