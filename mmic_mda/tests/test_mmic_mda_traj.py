@@ -28,7 +28,12 @@ def test_mmic_mda_imported():
 
 def test_mda_to_traj(**kwargs):
     traj = mda.Universe(traj_file)
-    inputs = {"data_object": traj, "kwargs": kwargs}
+    inputs = {
+        "data_object": traj,
+        "schema_version": 1,
+        "schema_name": "mmel_input",
+        "keywords": kwargs,
+    }
     mm_traj = mmic_mda.components.MdaToTrajComponent.compute(inputs)
 
     return mm_traj
@@ -36,7 +41,12 @@ def test_mda_to_traj(**kwargs):
 
 def test_mda_to_top_traj(guess_bonds, **kwargs):
     traj = mda.Universe(top_file, traj_file, guess_bonds=guess_bonds)
-    inputs = {"data_object": traj, "kwargs": kwargs}
+    inputs = {
+        "data_object": traj,
+        "schema_version": 1,
+        "schema_name": "mmel_input",
+        "keywords": kwargs,
+    }
     mm_traj = mmic_mda.components.MdaToTrajComponent.compute(inputs)
 
     return mm_traj
@@ -44,7 +54,7 @@ def test_mda_to_top_traj(guess_bonds, **kwargs):
 
 def test_io_methods(guess_bonds):
     mda_traj = mmic_mda.models.MdaTraj.from_file(top_file, guess_bonds=guess_bonds)
-    assert isinstance(mda_traj.data, mda_traj.dtype)
+    assert isinstance(mda_traj.data, mda_traj.dtype())
 
     mm_traj = mda_traj.to_schema()
     assert isinstance(mm_traj, mm.models.collect.Trajectory)
