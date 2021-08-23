@@ -1,5 +1,6 @@
 from mmelemental.models import Molecule, Trajectory
 from typing import List, Tuple, Optional
+import numpy
 
 from mmic_translator import TransComponent
 from mmic_translator.models import (
@@ -85,9 +86,21 @@ class MdaToTrajComponent(TransComponent):
         geometry, velocities, forces = [], [], []
 
         for frame in uni.trajectory:
-            geometry.append(frame.positions) if frame.has_positions else ...
-            velocities.append(frame.velocities) if frame.has_velocities else ...
-            forces.append(frame.forces) if frame.has_forces else ...
+            geometry = (
+                numpy.concatenate((geometry, frame.positions.flatten()))
+                if frame.has_positions
+                else geometry
+            )
+            velocities = (
+                numpy.concatenate((velocities, frame.velocities.flatten()))
+                if frame.has_velocities
+                else velocities
+            )
+            forces = (
+                numpy.concatenate((forces, frame.forces.flatten()))
+                if frame.has_forces
+                else forces
+            )
 
         timestep = uni.trajectory[0].dt
         timestep_units = "ps"
@@ -97,13 +110,15 @@ class MdaToTrajComponent(TransComponent):
         return success, TransOutput(
             proc_input=inputs,
             schema_object=Trajectory(
+                natoms=uni.trajectory.n_atoms,  # mda assumes constant natoms?
+                nframes=uni.trajectory.n_frames,
                 timestep=timestep,
                 timestep_units=timestep_units,
-                geometry=geometry,
+                geometry=geometry if len(geometry) > 0 else None,
                 geometry_units="A",
-                velocities=velocities,
+                velocities=velocities if len(velocities) > 0 else None,
                 velocities_units="A/ps",
-                forces=forces,
+                forces=forces if len(forces) > 0 else None,
                 forces_units="kJ/(mol*A)",
             ),
             schema_version=inputs.schema_version,
