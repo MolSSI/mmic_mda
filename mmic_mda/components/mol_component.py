@@ -30,11 +30,10 @@ class MolToMdaComponent(TransComponent):
         natoms = len(mmol.symbols)
 
         if hasattr(mmol, "substructs"):
-            residues = list(_fast_set(mmol.substructs))
-            nres = len(residues)
-            resnames, _ = zip(*residues)
-            _, resids = zip(*mmol.substructs)
-            resids = [i - 1 for i in resids]
+            nres = len(mmol.substructs)
+            resnames, resids = zip(*mmol.substructs)
+            resids = [resid + 1 for resid in resids]
+            # resnames = [resname.decode() for resname in resnames]
         else:
             nres = 1
             resnames, resids = "UNK", [1]
@@ -61,8 +60,7 @@ class MolToMdaComponent(TransComponent):
         if mmol.atom_labels is not None:
             mda_mol.add_TopologyAttr("name", mmol.atom_labels)
 
-        if hasattr(mmol, "substructs") is not None:
-            mda_mol.add_TopologyAttr("resname", resnames)
+        mda_mol.add_TopologyAttr("resname", resnames)
 
         # mda_mol.add_TopologyAttr('segid', ['SOL'])
 
@@ -80,7 +78,7 @@ class MolToMdaComponent(TransComponent):
                 units["speed"],
             )
 
-        if mmol.connectivity:
+        if mmol.connectivity is not None:
             bonds = [(bond[0], bond[1]) for bond in mmol.connectivity]
             mda_mol.add_TopologyAttr("bonds", bonds)
             # How to load bond order?
@@ -125,10 +123,10 @@ class MdaToMolComponent(TransComponent):
         vel = TransComponent.get(uni.atoms, "velocities")
         symbs = TransComponent.get(uni.atoms, "types")
         names = TransComponent.get(uni.atoms, "names")
-        if names is not None:
-            names = names.tolist()  # must be list for MMSchema
-        if symbs is not None:
-            symbs = symbs.tolist()
+        # if names is not None:
+        #    names = names.tolist()  # must be list for MMSchema
+        # if symbs is not None:
+        #    symbs = symbs.tolist()
         masses = TransComponent.get(uni.atoms, "masses")
 
         # If bond order is none, set it to 1.
@@ -140,7 +138,7 @@ class MdaToMolComponent(TransComponent):
         else:
             connectivity = None
 
-        residues = [(atom.resname, atom.resnum) for atom in uni.atoms]
+        residues = [(atom.resname, atom.resnum - 1) for atom in uni.atoms]
 
         input_dict = {
             "symbols": symbs,
