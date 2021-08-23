@@ -170,10 +170,3 @@ class MdaToMolComponent(TransComponent):
             Return a valid, safe python version string.
         """
         raise NotImplementedError
-
-
-def _fast_set(seq: List) -> List:
-    """Removes duplicate entries in a list while preserving the order."""
-    seen = set()
-    seen_add = seen.add
-    return [x for x in seq if not (x in seen or seen_add(x))]
