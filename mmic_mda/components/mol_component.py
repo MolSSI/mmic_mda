@@ -123,10 +123,6 @@ class MdaToMolComponent(TransComponent):
         vel = TransComponent.get(uni.atoms, "velocities")
         symbs = TransComponent.get(uni.atoms, "types")
         names = TransComponent.get(uni.atoms, "names")
-        # if names is not None:
-        #    names = names.tolist()  # must be list for MMSchema
-        # if symbs is not None:
-        #    symbs = symbs.tolist()
         masses = TransComponent.get(uni.atoms, "masses")
 
         # If bond order is none, set it to 1.
