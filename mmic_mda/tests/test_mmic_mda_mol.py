@@ -41,7 +41,6 @@ def test_mda_to_mol(guess_bonds, **kwargs):
         mm_mol = mmic_mda.components.MdaToMolComponent.compute(inputs)
 
 
-@pytest.mark.skip("Memory leak detected.")
 def test_mol_to_mda(guess_bonds):
     for file in top_file:
         mm_mol = mm.models.molecule.mm_mol.Molecule.from_file(file)
