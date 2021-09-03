@@ -43,7 +43,7 @@ def test_mda_to_mol(guess_bonds, **kwargs):
 
 def test_mol_to_mda(guess_bonds):
     for file in top_file:
-        mm_mol = mm.models.molecule.mm_mol.Molecule.from_file(file)
+        mm_mol = mm.models.Molecule.from_file(file)
         inputs = {
             "schema_object": mm_mol,
             "schema_version": 1,
@@ -58,4 +58,4 @@ def test_io_methods(guess_bonds):
         assert isinstance(mda_mol.data, mda_mol.dtype())
 
         mm_mol = mda_mol.to_schema()
-        assert isinstance(mm_mol, mm.models.molecule.Molecule)
+        assert isinstance(mm_mol, mm.models.Molecule)
