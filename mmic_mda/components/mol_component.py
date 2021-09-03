@@ -1,4 +1,4 @@
-from mmelemental.models.molecule import Molecule
+from mmelemental.models import Molecule
 from typing import List, Tuple, Optional
 from mmelemental.util.units import convert
 import MDAnalysis
@@ -143,11 +143,14 @@ class MdaToMolComponent(TransComponent):
             "velocities": vel,
             "velocities_units": units["speed"],
             "substructs": residues,
-            "connectivity": connectivity,
             "masses": masses,
             "masses_units": units["mass"],
             "atom_labels": names,
+            "extras": inputs.keywords.get("extras"),
         }
+
+        if connectivity:
+            input_dict["connectivity"] = connectivity
 
         success = True
         return success, TransOutput(

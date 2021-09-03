@@ -3,7 +3,7 @@ from mmic_translator.models import (
     ToolkitModel,
     schema_input_default,
 )
-from mmelemental.models.molecule import Molecule
+from mmelemental.models import Molecule
 import MDAnalysis
 
 # MDAnalysis converter components
@@ -95,6 +95,7 @@ class MdaMol(ToolkitModel):
             "schema_object": data,
             "schema_version": version or data.schema_version,
             "schema_name": schema_input_default,
+            "keywords": kwargs,
         }
         out = MolToMdaComponent.compute(inputs)
         return cls(data=out.data_object, units=out.data_units)
