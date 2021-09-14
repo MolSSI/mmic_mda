@@ -1,5 +1,5 @@
 from typing import Dict, Any, Optional
-from mmic_translator.models import ToolkitModel, schema_input_default
+from mmic_translator.models import ToolkitModel
 from mmelemental.models.collect import Trajectory
 import MDAnalysis
 
@@ -99,7 +99,7 @@ class MdaTraj(ToolkitModel):
         inputs = {
             "schema_object": data,
             "schema_version": version or data.schema_version,
-            "schema_name": schema_input_default,
+            "schema_name": data.schema_name,
         }
         return TrajToMdaComponent.compute(inputs)
 
@@ -125,7 +125,7 @@ class MdaTraj(ToolkitModel):
         inputs = {
             "data_object": self.data,
             "schema_version": version,
-            "schema_name": schema_input_default,
+            "schema_name": kwargs.pop("schema_name", Trajectory.default_schema_name),
             "keywords": kwargs,
         }
         out = MdaToTrajComponent.compute(inputs)
