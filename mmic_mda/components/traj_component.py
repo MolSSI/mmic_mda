@@ -1,13 +1,12 @@
 from mmelemental.models import Molecule, Trajectory
-from typing import List, Tuple, Optional
+from cmselemental.util.decorators import classproperty
+from mmic.components import TacticComponent
+from typing import List, Tuple, Optional, Set
 import numpy
 
-from mmic_translator import TransComponent
 from mmic_translator.models import (
     TransInput,
     TransOutput,
-    schema_input_default,
-    schema_output_default,
 )
 import MDAnalysis as mda
 from ..mmic_mda import units
@@ -15,7 +14,7 @@ from ..mmic_mda import units
 __all__ = ["TrajToMdaComponent", "MdaToTrajComponent"]
 
 
-class TrajToMdaComponent(TransComponent):
+class TrajToMdaComponent(TacticComponent):
     """A component for converting Trajectory to MDAnalysis Universe object."""
 
     @classmethod
@@ -25,6 +24,25 @@ class TrajToMdaComponent(TransComponent):
     @classmethod
     def output(cls):
         return TransOutput
+
+    @classmethod
+    def get_version(cls) -> str:
+        """Finds program, extracts version, returns normalized version string.
+        Returns
+        -------
+        str
+            Return a valid, safe python version string.
+        """
+        raise NotImplementedError
+
+    @classproperty
+    def strategy_comps(cls) -> Set[str]:
+        """Returns the strategy component(s) this (tactic) component belongs to.
+        Returns
+        -------
+        Set[str]
+        """
+        return {"mmic_translator"}
 
     def execute(
         self,
@@ -104,13 +122,40 @@ class TrajToMdaComponent(TransComponent):
             data_object=data_object,
             data_units=units,
             schema_version=inputs.schema_version,
-            schema_name=schema_output_default,
+            schema_name=inputs.schema_name,
             success=success,
         )
 
 
-class MdaToTrajComponent(TransComponent):
+class MdaToTrajComponent(TacticComponent):
     """A component for converting MDAnalysis Universe to Molecule object."""
+
+    @classmethod
+    def input(cls):
+        return TransInput
+
+    @classmethod
+    def output(cls):
+        return TransOutput
+
+    @classmethod
+    def get_version(cls) -> str:
+        """Finds program, extracts version, returns normalized version string.
+        Returns
+        -------
+        str
+            Return a valid, safe python version string.
+        """
+        raise NotImplementedError
+
+    @classproperty
+    def strategy_comps(cls) -> Set[str]:
+        """Returns the strategy component(s) this (tactic) component belongs to.
+        Returns
+        -------
+        Set[str]
+        """
+        return {"mmic_translator"}
 
     def execute(
         self,
@@ -132,11 +177,11 @@ class MdaToTrajComponent(TransComponent):
             inputs_mol = {
                 "data_object": uni,
                 "schema_version": inputs.schema_version,
-                "schema_name": schema_input_default,
+                "schema_name": inputs.schema_name,
                 "keywords": inputs.keywords,
             }
             out = MdaToMolComponent.compute(inputs_mol)
-            if TransComponent.get(out, "schema_version"):
+            if getattr(out, "schema_version", None):
                 assert inputs.schema_version == out.schema_version
 
         geometry, velocities, forces = [], [], []
@@ -178,7 +223,7 @@ class MdaToTrajComponent(TransComponent):
                 forces_units="kJ/(mol*A)",
             ),
             schema_version=inputs.schema_version,
-            schema_name=schema_output_default,
+            schema_name=inputs.schema_name,
             success=success,
         )
 

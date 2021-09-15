@@ -1,18 +1,51 @@
+from mmic.components import TacticComponent
 from mmelemental.models import Molecule
-from typing import List, Tuple, Optional
 from mmelemental.util.units import convert
+from cmselemental.util.decorators import classproperty
+from mmic_translator.models import TransInput, TransOutput
+from ..mmic_mda import units, __version__
+from typing import List, Tuple, Optional, Set
 import MDAnalysis
-
-from mmic_translator import TransComponent
-from mmic_translator.models import TransInput, TransOutput, schema_output_default
-
-from ..mmic_mda import units
 
 __all__ = ["MolToMdaComponent", "MdaToMolComponent"]
 
 
-class MolToMdaComponent(TransComponent):
+provenance_stamp = {
+    "creator": "mmic_mda",
+    "version": __version__,
+    "routine": __name__,
+}
+
+
+class MolToMdaComponent(TacticComponent):
     """A component for converting Molecule to MDAnalysis molecule object."""
+
+    @classmethod
+    def input(cls):
+        return TransInput
+
+    @classmethod
+    def output(cls):
+        return TransOutput
+
+    @classmethod
+    def get_version(cls) -> str:
+        """Finds program, extracts version, returns normalized version string.
+        Returns
+        -------
+        str
+            Return a valid, safe python version string.
+        """
+        raise NotImplementedError
+
+    @classproperty
+    def strategy_comps(cls) -> Set[str]:
+        """Returns the strategy component(s) this (tactic) component belongs to.
+        Returns
+        -------
+        Set[str]
+        """
+        return {"mmic_translator"}
 
     def execute(
         self,
@@ -89,12 +122,13 @@ class MolToMdaComponent(TransComponent):
             data_object=mda_mol,
             data_units=units,
             schema_version=inputs.schema_version,
-            schema_name=schema_output_default,
+            schema_name=inputs.schema_name,
             success=success,
+            provenance=provenance_stamp,
         )
 
 
-class MdaToMolComponent(TransComponent):
+class MdaToMolComponent(TacticComponent):
     """A component for converting MDAnalysis molecule to Molecule object."""
 
     @classmethod
@@ -104,6 +138,25 @@ class MdaToMolComponent(TransComponent):
     @classmethod
     def output(cls):
         return TransOutput
+
+    @classmethod
+    def get_version(cls) -> str:
+        """Finds program, extracts version, returns normalized version string.
+        Returns
+        -------
+        str
+            Return a valid, safe python version string.
+        """
+        raise NotImplementedError
+
+    @classproperty
+    def strategy_comps(cls) -> Set[str]:
+        """Returns the strategy component(s) this (tactic) component belongs to.
+        Returns
+        -------
+        Set[str]
+        """
+        return {"mmic_translator"}
 
     def execute(
         self,
@@ -119,11 +172,11 @@ class MdaToMolComponent(TransComponent):
 
         # get all properties + more from Universe?
         uni = inputs.data_object
-        geo = TransComponent.get(uni.atoms, "positions")
-        vel = TransComponent.get(uni.atoms, "velocities")
-        symbs = TransComponent.get(uni.atoms, "types")
-        names = TransComponent.get(uni.atoms, "names")
-        masses = TransComponent.get(uni.atoms, "masses")
+        geo = getattr(uni.atoms, "positions", None)
+        vel = getattr(uni.atoms, "velocities", None)
+        symbs = getattr(uni.atoms, "types", None)
+        names = getattr(uni.atoms, "names", None)
+        masses = getattr(uni.atoms, "masses", None)
 
         # If bond order is none, set it to 1.
         if hasattr(uni.atoms, "bonds"):
@@ -157,15 +210,7 @@ class MdaToMolComponent(TransComponent):
             proc_input=inputs,
             schema_object=Molecule(**input_dict),
             schema_version=inputs.schema_version,
-            schema_name=schema_output_default,
+            schema_name=inputs.schema_name,
             success=success,
+            provenance=provenance_stamp,
         )
-
-    def get_version(self) -> str:
-        """Finds program, extracts version, returns normalized version string.
-        Returns
-        -------
-        str
-            Return a valid, safe python version string.
-        """
-        raise NotImplementedError
