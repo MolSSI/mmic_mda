@@ -13,7 +13,15 @@ __all__ = [
     "ffread_ext_maps",
     "ffwrite_ext_maps",
     "units",
+    "__version__",
 ]
+
+from ._version import get_versions
+
+versions = get_versions()
+__version__ = versions["version"]
+__git_revision__ = versions["full-revisionid"]
+del get_versions, versions
 
 # Molecule (xyz) read/write file extensions
 molread_ext_maps = {".gro": "gro", ".pdb": "pdb"}
