@@ -45,3 +45,5 @@ units = {
     "mass": "amu",
     "angle": "degrees",
 }
+
+_supported_versions = "<=2.0.0"  # 1.0.0 seems to work
