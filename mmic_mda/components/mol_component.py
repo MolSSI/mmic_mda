@@ -3,7 +3,7 @@ from mmelemental.models import Molecule
 from mmelemental.util.units import convert
 from cmselemental.util.decorators import classproperty
 from mmic_translator.models import TransInput, TransOutput
-from ..mmic_mda import units, __version__
+from ..mmic_mda import units, __version__, _supported_versions
 from typing import List, Tuple, Optional, Set
 import MDAnalysis
 
@@ -36,7 +36,7 @@ class MolToMdaComponent(TacticComponent):
         str
             Return a valid, safe python version string.
         """
-        raise NotImplementedError
+        raise _supported_versions
 
     @classproperty
     def strategy_comps(cls) -> Set[str]:

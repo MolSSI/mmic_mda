@@ -9,7 +9,7 @@ from mmic_translator.models import (
     TransOutput,
 )
 import MDAnalysis as mda
-from ..mmic_mda import units
+from ..mmic_mda import units, _supported_versions
 
 __all__ = ["TrajToMdaComponent", "MdaToTrajComponent"]
 
@@ -27,13 +27,20 @@ class TrajToMdaComponent(TacticComponent):
 
     @classmethod
     def get_version(cls) -> str:
-        """Finds program, extracts version, returns normalized version string.
+        """Returns distutils-style version string.
+
+        Examples
+        --------
+        The string ">1.0, !=1.5.1, <2.0" implies any version after 1.0 and before 2.0
+        is compatible, except 1.5.1
+
         Returns
         -------
         str
-            Return a valid, safe python version string.
+            Return a dist-utils valid version string.
+
         """
-        raise NotImplementedError
+        return _supported_versions
 
     @classproperty
     def strategy_comps(cls) -> Set[str]:
