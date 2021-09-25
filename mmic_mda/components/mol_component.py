@@ -20,23 +20,30 @@ provenance_stamp = {
 class MolToMdaComponent(TacticComponent):
     """A component for converting Molecule to MDAnalysis molecule object."""
 
-    @classmethod
+    @classproperty
     def input(cls):
         return TransInput
 
-    @classmethod
+    @classproperty
     def output(cls):
         return TransOutput
 
-    @classmethod
-    def get_version(cls) -> str:
-        """Finds program, extracts version, returns normalized version string.
+    @classproperty
+    def version(cls) -> str:
+        """Returns distutils-style version string.
+
+        Examples
+        --------
+        The string ">1.0, !=1.5.1, <2.0" implies any version after 1.0 and before 2.0
+        is compatible, except 1.5.1
+
         Returns
         -------
         str
-            Return a valid, safe python version string.
+            Return a dist-utils valid version string.
+
         """
-        raise _supported_versions
+        return _supported_versions
 
     @classproperty
     def strategy_comps(cls) -> Set[str]:
@@ -57,7 +64,7 @@ class MolToMdaComponent(TacticComponent):
     ) -> Tuple[bool, TransOutput]:
 
         if isinstance(inputs, dict):
-            inputs = self.input()(**inputs)
+            inputs = self.input(**inputs)
 
         mmol = inputs.schema_object
         natoms = len(mmol.symbols)
@@ -131,23 +138,30 @@ class MolToMdaComponent(TacticComponent):
 class MdaToMolComponent(TacticComponent):
     """A component for converting MDAnalysis molecule to Molecule object."""
 
-    @classmethod
+    @classproperty
     def input(cls):
         return TransInput
 
-    @classmethod
+    @classproperty
     def output(cls):
         return TransOutput
 
-    @classmethod
-    def get_version(cls) -> str:
-        """Finds program, extracts version, returns normalized version string.
+    @classproperty
+    def version(cls) -> str:
+        """Returns distutils-style version string.
+
+        Examples
+        --------
+        The string ">1.0, !=1.5.1, <2.0" implies any version after 1.0 and before 2.0
+        is compatible, except 1.5.1
+
         Returns
         -------
         str
-            Return a valid, safe python version string.
+            Return a dist-utils valid version string.
+
         """
-        raise NotImplementedError
+        return _supported_versions
 
     @classproperty
     def strategy_comps(cls) -> Set[str]:
@@ -168,7 +182,7 @@ class MdaToMolComponent(TacticComponent):
     ) -> Tuple[bool, TransOutput]:
 
         if isinstance(inputs, dict):
-            inputs = self.input()(**inputs)
+            inputs = self.input(**inputs)
 
         # get all properties + more from Universe?
         uni = inputs.data_object

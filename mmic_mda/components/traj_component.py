@@ -17,16 +17,16 @@ __all__ = ["TrajToMdaComponent", "MdaToTrajComponent"]
 class TrajToMdaComponent(TacticComponent):
     """A component for converting Trajectory to MDAnalysis Universe object."""
 
-    @classmethod
+    @classproperty
     def input(cls):
         return TransInput
 
-    @classmethod
+    @classproperty
     def output(cls):
         return TransOutput
 
-    @classmethod
-    def get_version(cls) -> str:
+    @classproperty
+    def version(cls) -> str:
         """Returns distutils-style version string.
 
         Examples
@@ -61,7 +61,7 @@ class TrajToMdaComponent(TacticComponent):
     ) -> Tuple[bool, TransOutput]:
 
         if isinstance(inputs, dict):
-            inputs = self.input()(**inputs)
+            inputs = self.input(**inputs)
 
         mm_traj = inputs.schema_object
         nframes = inputs.schema_object.nframes
@@ -137,23 +137,30 @@ class TrajToMdaComponent(TacticComponent):
 class MdaToTrajComponent(TacticComponent):
     """A component for converting MDAnalysis Universe to Molecule object."""
 
-    @classmethod
+    @classproperty
     def input(cls):
         return TransInput
 
-    @classmethod
+    @classproperty
     def output(cls):
         return TransOutput
 
-    @classmethod
-    def get_version(cls) -> str:
-        """Finds program, extracts version, returns normalized version string.
+    @classproperty
+    def version(cls) -> str:
+        """Returns distutils-style version string.
+
+        Examples
+        --------
+        The string ">1.0, !=1.5.1, <2.0" implies any version after 1.0 and before 2.0
+        is compatible, except 1.5.1
+
         Returns
         -------
         str
-            Return a valid, safe python version string.
+            Return a dist-utils valid version string.
+
         """
-        raise NotImplementedError
+        return _supported_versions
 
     @classproperty
     def strategy_comps(cls) -> Set[str]:
@@ -174,7 +181,7 @@ class MdaToTrajComponent(TacticComponent):
     ) -> Tuple[bool, TransOutput]:
 
         if isinstance(inputs, dict):
-            inputs = self.input()(**inputs)
+            inputs = self.input(**inputs)
 
         uni = inputs.data_object
 
