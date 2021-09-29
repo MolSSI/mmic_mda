@@ -2,8 +2,8 @@ from mmic.components import TacticComponent
 from mmelemental.models import Molecule
 from mmelemental.util.units import convert
 from cmselemental.util.decorators import classproperty
-from mmic_translator.models import TransInput, TransOutput
-from ..mmic_mda import units, __version__, _supported_versions
+from mmic_translator.models import InputTrans, OutputTrans
+from ..mmic_mda import units, __version__, __package__, _supported_versions
 from typing import List, Tuple, Optional, Set
 import MDAnalysis
 
@@ -11,7 +11,7 @@ __all__ = ["MolToMdaComponent", "MdaToMolComponent"]
 
 
 provenance_stamp = {
-    "creator": "mmic_mda",
+    "creator": __package__,
     "version": __version__,
     "routine": __name__,
 }
@@ -22,11 +22,11 @@ class MolToMdaComponent(TacticComponent):
 
     @classproperty
     def input(cls):
-        return TransInput
+        return InputTrans
 
     @classproperty
     def output(cls):
-        return TransOutput
+        return OutputTrans
 
     @classproperty
     def version(cls) -> str:
@@ -56,12 +56,12 @@ class MolToMdaComponent(TacticComponent):
 
     def execute(
         self,
-        inputs: TransInput,
+        inputs: InputTrans,
         extra_outfiles: Optional[List[str]] = None,
         extra_commands: Optional[List[str]] = None,
         scratch_name: Optional[str] = None,
         timeout: Optional[int] = None,
-    ) -> Tuple[bool, TransOutput]:
+    ) -> Tuple[bool, OutputTrans]:
 
         if isinstance(inputs, dict):
             inputs = self.input(**inputs)
@@ -124,7 +124,7 @@ class MolToMdaComponent(TacticComponent):
             # How to load bond order?
 
         success = True
-        return success, TransOutput(
+        return success, OutputTrans(
             proc_input=inputs,
             data_object=mda_mol,
             data_units=units,
@@ -140,11 +140,11 @@ class MdaToMolComponent(TacticComponent):
 
     @classproperty
     def input(cls):
-        return TransInput
+        return InputTrans
 
     @classproperty
     def output(cls):
-        return TransOutput
+        return OutputTrans
 
     @classproperty
     def version(cls) -> str:
@@ -179,7 +179,7 @@ class MdaToMolComponent(TacticComponent):
         extra_commands: Optional[List[str]] = None,
         scratch_name: Optional[str] = None,
         timeout: Optional[int] = None,
-    ) -> Tuple[bool, TransOutput]:
+    ) -> Tuple[bool, OutputTrans]:
 
         if isinstance(inputs, dict):
             inputs = self.input(**inputs)
@@ -220,7 +220,7 @@ class MdaToMolComponent(TacticComponent):
             input_dict["connectivity"] = connectivity
 
         success = True
-        return success, TransOutput(
+        return success, OutputTrans(
             proc_input=inputs,
             schema_object=Molecule(**input_dict),
             schema_version=inputs.schema_version,

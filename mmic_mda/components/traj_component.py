@@ -5,11 +5,17 @@ from typing import List, Tuple, Optional, Set
 import numpy
 
 from mmic_translator.models import (
-    TransInput,
-    TransOutput,
+    InputTrans,
+    OutputTrans,
 )
 import MDAnalysis as mda
-from ..mmic_mda import units, _supported_versions
+from ..mmic_mda import __package__, __version__, _supported_versions, units
+
+provenance_stamp = {
+    "creator": __package__,
+    "version": __version__,
+    "routine": __name__,
+}
 
 __all__ = ["TrajToMdaComponent", "MdaToTrajComponent"]
 
@@ -19,11 +25,11 @@ class TrajToMdaComponent(TacticComponent):
 
     @classproperty
     def input(cls):
-        return TransInput
+        return InputTrans
 
     @classproperty
     def output(cls):
-        return TransOutput
+        return OutputTrans
 
     @classproperty
     def version(cls) -> str:
@@ -53,12 +59,12 @@ class TrajToMdaComponent(TacticComponent):
 
     def execute(
         self,
-        inputs: TransInput,
+        inputs: InputTrans,
         extra_outfiles: Optional[List[str]] = None,
         extra_commands: Optional[List[str]] = None,
         scratch_name: Optional[str] = None,
         timeout: Optional[int] = None,
-    ) -> Tuple[bool, TransOutput]:
+    ) -> Tuple[bool, OutputTrans]:
 
         if isinstance(inputs, dict):
             inputs = self.input(**inputs)
@@ -124,13 +130,14 @@ class TrajToMdaComponent(TacticComponent):
             data_object = mda.Universe(coords, **kwargs)
 
         success = True
-        return success, TransOutput(
+        return success, OutputTrans(
             proc_input=inputs,
             data_object=data_object,
             data_units=units,
             schema_version=inputs.schema_version,
             schema_name=inputs.schema_name,
             success=success,
+            provenance=provenance_stamp,
         )
 
 
@@ -139,11 +146,11 @@ class MdaToTrajComponent(TacticComponent):
 
     @classproperty
     def input(cls):
-        return TransInput
+        return InputTrans
 
     @classproperty
     def output(cls):
-        return TransOutput
+        return OutputTrans
 
     @classproperty
     def version(cls) -> str:
@@ -173,12 +180,12 @@ class MdaToTrajComponent(TacticComponent):
 
     def execute(
         self,
-        inputs: TransInput,
+        inputs: InputTrans,
         extra_outfiles: Optional[List[str]] = None,
         extra_commands: Optional[List[str]] = None,
         scratch_name: Optional[str] = None,
         timeout: Optional[int] = None,
-    ) -> Tuple[bool, TransOutput]:
+    ) -> Tuple[bool, OutputTrans]:
 
         if isinstance(inputs, dict):
             inputs = self.input(**inputs)
@@ -222,7 +229,7 @@ class MdaToTrajComponent(TacticComponent):
 
         # By using frames we are assuming the topology is constant. Is this always true in MDAnalysis?
         success = True
-        return success, TransOutput(
+        return success, OutputTrans(
             proc_input=inputs,
             schema_object=Trajectory(
                 natoms=uni.trajectory.n_atoms,  # mda assumes constant natoms?
@@ -239,6 +246,7 @@ class MdaToTrajComponent(TacticComponent):
             schema_version=inputs.schema_version,
             schema_name=inputs.schema_name,
             success=success,
+            provenance=provenance_stamp,
         )
 
     def get_version(self) -> str:
