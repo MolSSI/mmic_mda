@@ -1,6 +1,7 @@
 from typing import Dict, Any, Optional
 from mmic_translator.models import ToolkitModel
 from mmelemental.models import Molecule
+from cmselemental.util.decorators import classproperty
 import MDAnalysis
 
 # MDAnalysis converter components
@@ -13,11 +14,11 @@ __all__ = ["MdaMol"]
 class MdaMol(ToolkitModel):
     """A model for MDAnalysis.Universe storing an MM Molecule."""
 
-    @classmethod
+    @classproperty
     def engine(cls):
         return "MDAnalysis", MDAnalysis.__version__
 
-    @classmethod
+    @classproperty
     def dtype(cls):
         """Returns the fundamental molecule object type."""
         return MDAnalysis.Universe
