@@ -85,7 +85,7 @@ def test_traj_to_mda(traj_file, **kwargs):
 )
 def test_io_methods(guess_bonds, top_file):
     mda_traj = mmic_mda.models.MdaTraj.from_file(top_file, guess_bonds=guess_bonds)
-    assert isinstance(mda_traj.data, mda_traj.dtype())
+    assert isinstance(mda_traj.data, mda_traj.dtype)
 
     mm_traj = mda_traj.to_schema()
     assert isinstance(mm_traj, mm.models.collect.Trajectory)

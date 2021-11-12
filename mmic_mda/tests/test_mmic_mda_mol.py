@@ -55,7 +55,7 @@ def test_mol_to_mda(guess_bonds):
 def test_io_methods(guess_bonds):
     for file in top_file:
         mda_mol = mmic_mda.models.MdaMol.from_file(file, guess_bonds=guess_bonds)
-        assert isinstance(mda_mol.data, mda_mol.dtype())
+        assert isinstance(mda_mol.data, mda_mol.dtype)
 
         mm_mol = mda_mol.to_schema()
         assert isinstance(mm_mol, mm.models.Molecule)
