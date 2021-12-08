@@ -46,7 +46,8 @@ mm_mol = trans_out.schema_object -> MMElemental.models.Molecule
 ```
 
 Converting from `MMElemental.models.Molecule` to `MDAnalysis.Universe` is achieved with `MolToMdaComponent`:
- 
+
+```python 
 # Create input for converting MMSchema to Mda molecule
 trans_in = {
         "schema_object": MDAnalysis.Universe,
