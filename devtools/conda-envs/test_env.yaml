@@ -9,14 +9,14 @@ dependencies:
 
     # Pip-only installs
   - pip:
+    - cmselemental
+    - mmelemental
     - qcelemental
     - mdanalysis
     - numpy
     - codecov
     - pytest
     - pytest-cov
-    - git+https://github.com/MolSSI/cmselemental@v0.2.0
-    - git+https://github.com/MolSSI/mmelemental
     - git+https://github.com/MolSSI/mmic_translator
     - git+https://github.com/MolSSI/mm_data
     - git+https://github.com/MolSSI/mmic
