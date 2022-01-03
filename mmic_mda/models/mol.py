@@ -96,7 +96,7 @@ class MdaMol(ToolkitModel):
             "keywords": kwargs,
         }
         out = MolToMdaComponent.compute(inputs)
-        return cls(data=out.data_object, data_units=out.data_units)
+        return cls(data=out.data_object) #, data_units=out.data_units) # breaks validation
 
     def to_file(self, filename: str, dtype: str = None, mode: str = "w", **kwargs):
         """Writes the molecule to a file.
