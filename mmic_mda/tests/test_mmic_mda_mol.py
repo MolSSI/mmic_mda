@@ -59,3 +59,10 @@ def test_io_methods(guess_bonds):
 
         mm_mol = mda_mol.to_schema()
         assert isinstance(mm_mol, mm.models.Molecule)
+
+        import tempfile
+
+        rand_file = tempfile.NamedTemporaryFile(suffix=".pdb")
+        mm_mol.to_file(rand_file.name)
+
+        mmic_mda.models.MdaMol.from_schema(mm_mol)
